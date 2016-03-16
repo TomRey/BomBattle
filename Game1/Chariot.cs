@@ -1,6 +1,8 @@
-﻿using FarseerPhysics.Dynamics;
+﻿using FarseerPhysics.Common;
+using FarseerPhysics.Dynamics;
 using FarseerPhysics.Factories;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -14,11 +16,14 @@ namespace Game1
         Texture2D t2Droue, t2Dpanier , CorbeilleGSprite, CorbeilleBSprite;
         Body[] tabBpanier = new Body[3]; //bChariotG, bChariotD, bChariotB, 
         Body bRoueG, bRoueD;
+        AnimatedGif explosionGif, fireGif;
 
         const int ROUE_SIZE = 50;
         const int PANIER_WIDTH = 200;
         const int PANIER_HEIGHT = 100;
         Vector2 panierOrigin, roueOrigin, impulsion;
+
+        bool gameOver { get; set; }
 
         public Chariot(World world)
         {
@@ -26,14 +31,21 @@ namespace Game1
             panierOrigin = new Vector2(PANIER_WIDTH / 2f, PANIER_HEIGHT);
             roueOrigin = new Vector2(ROUE_SIZE / 2f, ROUE_SIZE / 2f);
             impulsion = new Vector2(2f, 0f);
+            explosionGif = new AnimatedGif("images/explosion/", 89, true);
+            explosionGif.FrameDuration = 0.02;
+            explosionGif.Loop = false;
+            fireGif = new AnimatedGif("images/flamme/", 13, false);
+            gameOver = false;
         }
 
-        public void loadContent(Microsoft.Xna.Framework.Content.ContentManager content)
+        public void loadContent(ContentManager content)
         {
             t2Dpanier = content.Load<Texture2D>("images/"+ Game1.THEME + "/panier");
             t2Droue = content.Load<Texture2D>("images/" + Game1.THEME + "/roue");
             CorbeilleBSprite = content.Load<Texture2D>("images/CorbeilleB");
             CorbeilleGSprite = content.Load<Texture2D>("images/CorbeilleG");
+            explosionGif.Load(content);
+            fireGif.Load(content);
         }
 
         private void createBodies(World world)
@@ -102,6 +114,18 @@ namespace Game1
             tabBpanier[0].ApplyForce(new Vector2(0f, 50f));
         }
 
+        public void explose()
+        {
+            explosionGif.start();
+            fireGif.start();
+        }
+
+        public void update(TimeSpan elapsedGameTime)
+        {
+            explosionGif.Update(elapsedGameTime, tabBpanier[0].Position.X, tabBpanier[1].Position.Y);
+            fireGif.Update(elapsedGameTime, tabBpanier[0].Position.X, tabBpanier[1].Position.Y);
+        }
+
         public void draw(SpriteBatch spriteBatch)
         {
             //Debug
@@ -113,6 +137,8 @@ namespace Game1
             spriteBatch.Draw(t2Dpanier, tabBpanier[0].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[0].Rotation, panierOrigin, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(t2Droue, bRoueG.Position * Game1.METERINPIXEL, null, Color.White, bRoueG.Rotation, roueOrigin, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(t2Droue, bRoueD.Position * Game1.METERINPIXEL, null, Color.White, bRoueD.Rotation, roueOrigin, 1f, SpriteEffects.None, 0f);
+            fireGif.Draw(spriteBatch);
+            explosionGif.Draw(spriteBatch);
         }
 
         public Body[] getBodies()

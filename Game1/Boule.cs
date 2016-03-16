@@ -20,7 +20,7 @@ namespace Game1
         int idText2D = 0;
         Random rdmPos;
         bool sleep = true;
-        Texture2D t2D, t2DS;
+        Texture2D t2D;
         Vector2 pos, bouleOrigin;
         const int BOULE_SIZE = 45;
 
@@ -91,10 +91,11 @@ namespace Game1
             bBoule.ApplyLinearImpulse(new Vector2(direction * maxW, -maxH));
         }
 
-        public void update(Body[] chariot, GameTime gameTime)
+        public void update(Chariot chariot, GameTime gameTime, BouleManager parent)
         {
-           // particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-           // particleEffect.Trigger(new Vector(100, 100));
+            // particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            // particleEffect.Trigger(new Vector(100, 100));
+            Body[] chariotBodies = chariot.getBodies();
             if (!sleep)
             {
                 if (bBoule.Position.Y > (Game1.FENETRE.Height + BOULE_SIZE) / Game1.METERINPIXEL)
@@ -102,34 +103,36 @@ namespace Game1
                     standBy();
                 }
 
-                if (bBoule.Position.X > chariot[1].Position.X && bBoule.Position.X < chariot[2].Position.X && bBoule.Position.Y > chariot[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL))
+                if (bBoule.Position.X > chariotBodies[1].Position.X && bBoule.Position.X < chariotBodies[2].Position.X && bBoule.Position.Y > chariotBodies[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL))
                 {
-                    standBy();
+                        standBy();
                     if (idText2D < 6)
                     {
                         System.Diagnostics.Debug.WriteLine("+1");
+                        parent.showPoint("+1");
                     }
                     else
                     {
                         if (idText2D == 6)
                         {
                             System.Diagnostics.Debug.WriteLine("bombe");
+                            parent.showPoint("bombe");
+                            chariot.explose();
                         }
                         else
                         {
                             System.Diagnostics.Debug.WriteLine("bonus");
+                            parent.showPoint("bonus");
                         }
                     }
                 }
             }
         }
 
-        public void draw(SpriteBatch spriteBatch)
+        public void draw(SpriteBatch spriteBatch, SpriteFont fontScore)
         {
-
-            spriteBatch.Begin();
             spriteBatch.Draw(t2D, bBoule.Position * Game1.METERINPIXEL, null, Color.White, bBoule.Rotation, bouleOrigin, 1f, SpriteEffects.None, 0f);
-            spriteBatch.End();
+            
             //particleRenderer.Draw(particleEffect, spriteBatch);
             
         }

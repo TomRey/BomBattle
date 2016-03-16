@@ -14,9 +14,16 @@ namespace Game1
         Boule[] tabBboule = new Boule[10];
         Random rdmCanon;
         Vector2[] tabPosCanon = new Vector2[4];
-        Body[] chariot;
-        public BouleManager(World world, Vector2[] posCanon, Body sol, Body[] chariot, Texture2D blank)
+        Chariot chariot;
+        SpriteFont fontScore;
+
+        string strPoint = "";
+        Vector2 posTxt;
+        double time = 2;
+
+        public BouleManager(World world, Vector2[] posCanon, Body sol, Chariot chariot, Texture2D blank)
         {
+            posTxt = new Vector2((Game1.FENETRE.Width / 2), Game1.FENETRE.Height / 2);
             createBodies(world, sol, blank);
             rdmCanon = new Random();
             tabPosCanon = posCanon;
@@ -30,6 +37,8 @@ namespace Game1
 
         public void loadContent(Microsoft.Xna.Framework.Content.ContentManager content)
         {
+            fontScore = content.Load<SpriteFont>("font/candy");
+
             tabT2Dboule[0] = content.Load<Texture2D>("images/" + Game1.THEME + "/1");
             tabT2Dboule[1] = content.Load<Texture2D>("images/" + Game1.THEME + "/2");
             tabT2Dboule[2] = content.Load<Texture2D>("images/" + Game1.THEME + "/3");
@@ -54,9 +63,11 @@ namespace Game1
 
         public void draw(SpriteBatch spriteBatch)
         {
+            if (time < 1)
+                spriteBatch.DrawString(fontScore, strPoint, posTxt, Color.Black);
             for (int i = 0; i < tabBboule.Length; i++)
             {
-                tabBboule[i].draw(spriteBatch);
+                tabBboule[i].draw(spriteBatch, fontScore);
             }
         }
 
@@ -64,8 +75,17 @@ namespace Game1
         {
             for(int i = 0; i < tabBboule.Length; i++)
             {
-                 tabBboule[i].update(chariot, gameTime);
+                 tabBboule[i].update(chariot, gameTime, this);
             }
+            posTxt.X = Game1.FENETRE.Width / 2 - (fontScore.MeasureString(strPoint).X / 2);
+            posTxt.Y = Game1.FENETRE.Height / 2 - (fontScore.MeasureString(strPoint).Y / 2);
+            time += gameTime.ElapsedGameTime.TotalSeconds;
+        }
+
+        public void showPoint(string txt)
+        {
+            strPoint = txt;
+            time = 0;
         }
 
         public void launchBoule(int idCanon, int idBoule, int direction, int maxW, int maxH)

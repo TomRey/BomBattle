@@ -42,6 +42,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedGif.cs" />
+    <Compile Include="Arcade.cs" />
     <Compile Include="Boule.cs" />
     <Compile Include="BouleManager.cs" />
     <Compile Include="Canon.cs" />
@@ -54,9 +56,16 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormMulti.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMulti.Designer.cs">
+      <DependentUpon>FormMulti.cs</DependentUpon>
+    </Compile>
     <Compile Include="Game1.cs" />
     <Compile Include="Joueur.cs" />
     <Compile Include="Listener.cs" />
+    <Compile Include="Menu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
@@ -75,6 +84,9 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="RuminateGui">
+      <HintPath>..\RuminateGui.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -91,6 +103,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMulti.resx">
+      <DependentUpon>FormMulti.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
