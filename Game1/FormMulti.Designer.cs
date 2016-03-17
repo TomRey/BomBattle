@@ -43,16 +43,17 @@
             // tbxPseudo
             // 
             this.tbxPseudo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbxPseudo.Location = new System.Drawing.Point(12, 35);
+            this.tbxPseudo.Location = new System.Drawing.Point(14, 48);
+            this.tbxPseudo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tbxPseudo.Name = "tbxPseudo";
-            this.tbxPseudo.Size = new System.Drawing.Size(224, 20);
+            this.tbxPseudo.Size = new System.Drawing.Size(261, 26);
             this.tbxPseudo.TabIndex = 0;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(8, 58);
+            this.label1.Location = new System.Drawing.Point(9, 80);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(135, 19);
             this.label1.TabIndex = 1;
@@ -62,18 +63,19 @@
             // 
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(8, 13);
+            this.label2.Location = new System.Drawing.Point(9, 18);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(100, 19);
+            this.label2.Size = new System.Drawing.Size(117, 26);
             this.label2.TabIndex = 2;
             this.label2.Text = "Pseudo";
             // 
             // tbxIp
             // 
             this.tbxIp.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbxIp.Location = new System.Drawing.Point(12, 80);
+            this.tbxIp.Location = new System.Drawing.Point(14, 110);
+            this.tbxIp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tbxIp.Name = "tbxIp";
-            this.tbxIp.Size = new System.Drawing.Size(224, 20);
+            this.tbxIp.Size = new System.Drawing.Size(261, 26);
             this.tbxIp.TabIndex = 3;
             // 
             // btnCreer
@@ -82,9 +84,10 @@
             this.btnCreer.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnCreer.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnCreer.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCreer.Location = new System.Drawing.Point(130, 168);
+            this.btnCreer.Location = new System.Drawing.Point(152, 233);
+            this.btnCreer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCreer.Name = "btnCreer";
-            this.btnCreer.Size = new System.Drawing.Size(106, 31);
+            this.btnCreer.Size = new System.Drawing.Size(124, 43);
             this.btnCreer.TabIndex = 4;
             this.btnCreer.Text = "Valider";
             this.btnCreer.UseVisualStyleBackColor = false;
@@ -96,9 +99,10 @@
             this.btnRetour.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnRetour.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnRetour.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRetour.Location = new System.Drawing.Point(12, 168);
+            this.btnRetour.Location = new System.Drawing.Point(14, 233);
+            this.btnRetour.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnRetour.Name = "btnRetour";
-            this.btnRetour.Size = new System.Drawing.Size(112, 31);
+            this.btnRetour.Size = new System.Drawing.Size(131, 43);
             this.btnRetour.TabIndex = 6;
             this.btnRetour.Text = "Retour";
             this.btnRetour.UseVisualStyleBackColor = false;
@@ -108,9 +112,10 @@
             // 
             this.rdbHote.AutoSize = true;
             this.rdbHote.Checked = true;
-            this.rdbHote.Location = new System.Drawing.Point(20, 25);
+            this.rdbHote.Location = new System.Drawing.Point(23, 35);
+            this.rdbHote.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rdbHote.Name = "rdbHote";
-            this.rdbHote.Size = new System.Drawing.Size(86, 23);
+            this.rdbHote.Size = new System.Drawing.Size(100, 32);
             this.rdbHote.TabIndex = 7;
             this.rdbHote.TabStop = true;
             this.rdbHote.Text = "Heberger";
@@ -121,9 +126,11 @@
             this.groupBox1.Controls.Add(this.rdbClient);
             this.groupBox1.Controls.Add(this.rdbHote);
             this.groupBox1.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(12, 102);
+            this.groupBox1.Location = new System.Drawing.Point(14, 142);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(224, 60);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.groupBox1.Size = new System.Drawing.Size(261, 83);
             this.groupBox1.TabIndex = 8;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Type de connexion";
@@ -133,9 +140,10 @@
             this.rdbClient.AutoSize = true;
             this.rdbClient.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.rdbClient.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.rdbClient.Location = new System.Drawing.Point(112, 25);
+            this.rdbClient.Location = new System.Drawing.Point(131, 35);
+            this.rdbClient.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rdbClient.Name = "rdbClient";
-            this.rdbClient.Size = new System.Drawing.Size(85, 23);
+            this.rdbClient.Size = new System.Drawing.Size(99, 32);
             this.rdbClient.TabIndex = 8;
             this.rdbClient.Text = "Rejoindre";
             this.rdbClient.UseVisualStyleBackColor = true;
@@ -143,11 +151,11 @@
             // FormMulti
             // 
             this.AcceptButton = this.btnCreer;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.CancelButton = this.btnRetour;
-            this.ClientSize = new System.Drawing.Size(250, 214);
+            this.ClientSize = new System.Drawing.Size(292, 296);
             this.ControlBox = false;
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnRetour);
@@ -156,7 +164,9 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tbxPseudo);
+            this.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FormMulti";
             this.Text = "FormMulti";
             this.Load += new System.EventHandler(this.FormMulti_Load);
