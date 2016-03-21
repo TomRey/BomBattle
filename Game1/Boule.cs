@@ -105,24 +105,23 @@ namespace Game1
 
                 if (bBoule.Position.X > chariotBodies[1].Position.X && bBoule.Position.X < chariotBodies[2].Position.X && bBoule.Position.Y > chariotBodies[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL))
                 {
-                        standBy();
+                    standBy();
+
                     if (idText2D < 6)
                     {
-                        System.Diagnostics.Debug.WriteLine("+1");
-                        parent.showPoint("+1");
+                        parent.addPoint(idText2D);
                     }
                     else
                     {
                         if (idText2D == 6)
                         {
                             System.Diagnostics.Debug.WriteLine("bombe");
-                            parent.showPoint("bombe");
-                            chariot.explose();
+                            parent.gameOver();
                         }
                         else
                         {
                             System.Diagnostics.Debug.WriteLine("bonus");
-                            parent.showPoint("bonus");
+                            parent.addBonus();
                         }
                     }
                 }

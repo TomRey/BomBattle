@@ -56,6 +56,7 @@ namespace Game1
         /// Current State
         /// </summary>
         private int state;
+        private bool active = false;
 
         private int FRAME_WIDTH, FRAME_HEIGHT;
 
@@ -87,28 +88,37 @@ namespace Game1
 
         public void start()
         {
+            active = true;
             state = 0;
+        }
+
+        public void stop()
+        {
+            active = false;
         }
 
         public void Update(TimeSpan elapsedGameTime, float X, float Y)
         {
-            Position.X = X * Game1.METERINPIXEL - FRAME_WIDTH;
-            Position.Y = Y * Game1.METERINPIXEL - FRAME_HEIGHT;
-            timeSinceLastStateChange += elapsedGameTime.TotalSeconds;
-            if (timeSinceLastStateChange > FrameDuration)
+            if (active)
             {
-                timeSinceLastStateChange -= FrameDuration;
-                state++;
-            }
-            if (Loop && state == StateCount)
-            {
-                state = 0;
+                Position.X = X * Game1.METERINPIXEL - FRAME_WIDTH;
+                Position.Y = Y * Game1.METERINPIXEL - FRAME_HEIGHT;
+                timeSinceLastStateChange += elapsedGameTime.TotalSeconds;
+                if (timeSinceLastStateChange > FrameDuration)
+                {
+                    timeSinceLastStateChange -= FrameDuration;
+                    state++;
+                }
+                if (Loop && state == StateCount)
+                {
+                    state = 0;
+                }
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if (state < StateCount)
+            if (state < StateCount && active)
             {
                 spriteBatch.Draw(textures[state], Position, Color.White);
             }

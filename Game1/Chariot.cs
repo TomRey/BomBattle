@@ -1,5 +1,6 @@
 ﻿using FarseerPhysics.Common;
 using FarseerPhysics.Dynamics;
+using FarseerPhysics.Dynamics.Joints;
 using FarseerPhysics.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -13,7 +14,7 @@ namespace Game1
 {
     class Chariot
     {
-        Texture2D t2Droue, t2Dpanier , CorbeilleGSprite, CorbeilleBSprite;
+        Texture2D t2Droue, t2DroueGameOver, t2Dpanier, t2DpanierGameOver, CorbeilleGSprite, CorbeilleBSprite, t2DPanierActif, t2DroueActif;
         Body[] tabBpanier = new Body[3]; //bChariotG, bChariotD, bChariotB, 
         Body bRoueG, bRoueD;
         AnimatedGif explosionGif, fireGif;
@@ -22,12 +23,14 @@ namespace Game1
         const int PANIER_WIDTH = 200;
         const int PANIER_HEIGHT = 100;
         Vector2 panierOrigin, roueOrigin, impulsion;
-
+        Joint jointRoue;
+        World world;
         bool gameOver { get; set; }
 
         public Chariot(World world)
         {
             createBodies(world);
+            this.world = world;
             panierOrigin = new Vector2(PANIER_WIDTH / 2f, PANIER_HEIGHT);
             roueOrigin = new Vector2(ROUE_SIZE / 2f, ROUE_SIZE / 2f);
             impulsion = new Vector2(2f, 0f);
@@ -41,11 +44,15 @@ namespace Game1
         public void loadContent(ContentManager content)
         {
             t2Dpanier = content.Load<Texture2D>("images/"+ Game1.THEME + "/panier");
+            t2DpanierGameOver = content.Load<Texture2D>("images/" + Game1.THEME + "/panier2");
             t2Droue = content.Load<Texture2D>("images/" + Game1.THEME + "/roue");
+            t2DroueGameOver = content.Load<Texture2D>("images/" + Game1.THEME + "/roue2");
             CorbeilleBSprite = content.Load<Texture2D>("images/CorbeilleB");
             CorbeilleGSprite = content.Load<Texture2D>("images/CorbeilleG");
             explosionGif.Load(content);
             fireGif.Load(content);
+            t2DPanierActif = t2Dpanier;
+            t2DroueActif = t2Droue;
         }
 
         private void createBodies(World world)
@@ -82,10 +89,10 @@ namespace Game1
             bRoueD.CollisionCategories = Category.Cat2;
             bRoueD.Friction = 1f;
             #endregion
-
+ 
             #region Joint Panier
             JointFactory.CreateRevoluteJoint(world, tabBpanier[0], bRoueG, Vector2.Zero);
-            JointFactory.CreateRevoluteJoint(world, tabBpanier[0], bRoueD, Vector2.Zero);
+            jointRoue = JointFactory.CreateRevoluteJoint(world, tabBpanier[0], bRoueD, Vector2.Zero);
 
             JointFactory.CreateWeldJoint(world, tabBpanier[0], tabBpanier[1], new Vector2(tabBpanier[0].LocalCenter.X - (PANIER_WIDTH/ (2f*Game1.METERINPIXEL)), tabBpanier[0].LocalCenter.Y), new Vector2(tabBpanier[1].LocalCenter.X, tabBpanier[1].LocalCenter.Y + (PANIER_HEIGHT / (2f * Game1.METERINPIXEL))));
             JointFactory.CreateWeldJoint(world, tabBpanier[0], tabBpanier[2], new Vector2(tabBpanier[0].LocalCenter.X + (PANIER_WIDTH / (2f * Game1.METERINPIXEL)), tabBpanier[0].LocalCenter.Y), new Vector2(tabBpanier[2].LocalCenter.X, tabBpanier[2].LocalCenter.Y + (PANIER_HEIGHT / (2f * Game1.METERINPIXEL))));
@@ -118,6 +125,15 @@ namespace Game1
         {
             explosionGif.start();
             fireGif.start();
+            t2DPanierActif = t2DpanierGameOver;
+            t2DroueActif = t2DroueGameOver;
+            this.world.RemoveJoint(jointRoue);
+            //bRoueD.ApplyTorque(10f);
+            for(int i = 0; i < tabBpanier.Length; i++)
+                bRoueD.IgnoreCollisionWith(tabBpanier[i]);
+            bRoueD.ApplyTorque(10f);
+            bRoueD.ApplyLinearImpulse(new Vector2(1f, 2f));
+
         }
 
         public void update(TimeSpan elapsedGameTime)
@@ -131,12 +147,12 @@ namespace Game1
             //Debug
             /*
             spriteBatch.Draw(CorbeilleBSprite, tabBpanier[0].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[0].Rotation, new Vector2(CorbeilleBSprite.Width / 2f, CorbeilleBSprite.Height / 2f), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(CorbeilleGSprite, tabBpanier[1].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[0].Rotation, new Vector2(CorbeilleGSprite.Width / 2f, CorbeilleGSprite.Height / 2f), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(CorbeilleGSprite, tabBpanier[2].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[0].Rotation, new Vector2(CorbeilleGSprite.Width / 2f, CorbeilleGSprite.Height / 2f), 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(CorbeilleGSprite, tabBpanier[1].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[1].Rotation, new Vector2(CorbeilleGSprite.Width / 2f, CorbeilleGSprite.Height / 2f), 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(CorbeilleGSprite, tabBpanier[2].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[2].Rotation, new Vector2(CorbeilleGSprite.Width / 2f, CorbeilleGSprite.Height / 2f), 1f, SpriteEffects.None, 0f);
             */
-            spriteBatch.Draw(t2Dpanier, tabBpanier[0].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[0].Rotation, panierOrigin, 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(t2Droue, bRoueG.Position * Game1.METERINPIXEL, null, Color.White, bRoueG.Rotation, roueOrigin, 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(t2Droue, bRoueD.Position * Game1.METERINPIXEL, null, Color.White, bRoueD.Rotation, roueOrigin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(t2DPanierActif, tabBpanier[0].Position * Game1.METERINPIXEL, null, Color.White, tabBpanier[0].Rotation, panierOrigin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(t2DroueActif, bRoueG.Position * Game1.METERINPIXEL, null, Color.White, bRoueG.Rotation, roueOrigin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(t2DroueActif, bRoueD.Position * Game1.METERINPIXEL, null, Color.White, bRoueD.Rotation, roueOrigin, 1f, SpriteEffects.None, 0f);
             fireGif.Draw(spriteBatch);
             explosionGif.Draw(spriteBatch);
         }

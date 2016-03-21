@@ -13,6 +13,15 @@ using System;
 
 namespace Game1
 {
+    public enum GameState
+    {
+        Menu,
+        Multi,
+        Settings,
+        Game,
+        GameOver
+    };
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -43,17 +52,10 @@ namespace Game1
         Rectangle rectMouse;
         Rectangle rectWallpaper;
         Menu menu;
+        GameOver gameOver;
 
 
         GameState gameState;
-
-        enum GameState
-        {
-            Menu,
-            Multi,
-            Settings,
-            Game
-        };
 
         public Game1()
         {
@@ -92,6 +94,7 @@ namespace Game1
             rectWallpaper = new Rectangle(0, 0, FENETRE.Width, FENETRE.Height);
             rectMouse = new Rectangle(0, 0, MOUSE_WIDTH, MOUSE_HEIGT);
             menu = new Menu(this);
+            gameOver = new GameOver(this);
 
             #region Définition des bords
             sol = BodyFactory.CreateRectangle(world, FENETRE.Width, 1f / METERINPIXEL, 1f, new Vector2(0, FENETRE.Height / METERINPIXEL));
@@ -115,7 +118,7 @@ namespace Game1
 
             chariot = new Chariot(world);
             canon = new Canon();
-            manager = new BouleManager(world, canon.getPosCanon(), sol, chariot, new Texture2D(GraphicsDevice, 1, 1));
+            manager = new BouleManager(world, canon.getPosCanon(), sol, chariot, new Texture2D(GraphicsDevice, 1, 1), this);
 
             base.Initialize();
         }
@@ -131,6 +134,7 @@ namespace Game1
             t2Dwall = Content.Load<Texture2D>("images/wood/wall");
             t2Dmouse = Content.Load<Texture2D>("images/mouse");
             menu.loadContent(Content);
+            gameOver.loadContent(Content);
             canon.loadContent(Content);
             chariot.loadContent(Content);
             manager.loadContent(Content);
@@ -167,9 +171,15 @@ namespace Game1
                 lastms = ms;
             }
 
-            chariot.update(gameTime.ElapsedGameTime);
-            HandleKeyboard();
+            if (gameState == GameState.GameOver)
+            {
+                gameOver.update(ms, lastms);
+                lastms = ms;
+            }
+            else
+                HandleKeyboard();
 
+            chariot.update(gameTime.ElapsedGameTime);
             manager.update(gameTime);
 
             world.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f);
@@ -227,6 +237,16 @@ namespace Game1
                 chariot.draw(spriteBatch);
             }
 
+            if (gameState == GameState.GameOver)
+            {
+                spriteBatch.Draw(t2Dwall, rectWallpaper, Color.White);
+                gameOver.draw(spriteBatch);
+                canon.draw(spriteBatch);
+                manager.draw(spriteBatch);
+                chariot.draw(spriteBatch);
+                spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
+            }
+
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -235,6 +255,11 @@ namespace Game1
         public void startArcade()
         {
             gameState = GameState.Game;
+        }
+
+        public void setGameState(GameState state)
+        {
+            gameState = state;
         }
 
         public void startMulti()
@@ -259,6 +284,18 @@ namespace Game1
             gameState = GameState.Menu;
         }
 
+        public void save()
+        {
+            FormArcade form = new FormArcade(this.Window.ClientBounds);
+            form.ShowDialog();
+            if (form.DialogResult == System.Windows.Forms.DialogResult.OK)
+            {
+                gameState = GameState.Menu;
+            }
+            System.Diagnostics.Debug.WriteLine(form.Pseudo);
+        }
+
+        
         
     }
 }

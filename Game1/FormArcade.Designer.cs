@@ -55,6 +55,7 @@
             // btnSave
             // 
             this.btnSave.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.btnSave.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnSave.Location = new System.Drawing.Point(111, 79);
             this.btnSave.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -68,6 +69,7 @@
             // btnAnnuler
             // 
             this.btnAnnuler.BackColor = System.Drawing.Color.Wheat;
+            this.btnAnnuler.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnAnnuler.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnAnnuler.Location = new System.Drawing.Point(14, 79);
             this.btnAnnuler.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -80,9 +82,11 @@
             // 
             // FormArcade
             // 
+            this.AcceptButton = this.btnSave;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
+            this.CancelButton = this.btnAnnuler;
             this.ClientSize = new System.Drawing.Size(211, 130);
             this.ControlBox = false;
             this.Controls.Add(this.btnAnnuler);
@@ -94,6 +98,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FormArcade";
             this.Text = "FormArcade";
+            this.Load += new System.EventHandler(this.FormArcade_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

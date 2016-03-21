@@ -69,6 +69,7 @@
       <DependentUpon>FormMulti.cs</DependentUpon>
     </Compile>
     <Compile Include="Game1.cs" />
+    <Compile Include="GameOver.cs" />
     <Compile Include="Joueur.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="Menu.cs" />

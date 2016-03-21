@@ -15,15 +15,22 @@ namespace Game1
         Random rdmCanon;
         Vector2[] tabPosCanon = new Vector2[4];
         Chariot chariot;
-        SpriteFont fontScore;
-
+        SpriteFont fontScore, fontInfo;
+        int[] tabValeurBoule;
         string strPoint = "";
-        Vector2 posTxt;
+        Vector2 posTxt, posScore;
         double time = 2;
+        const int SCORE_MAX = 3000;
+        int score = 0;
+        int currentScore = 0;
+        Game1 parent;
 
-        public BouleManager(World world, Vector2[] posCanon, Body sol, Chariot chariot, Texture2D blank)
+        public BouleManager(World world, Vector2[] posCanon, Body sol, Chariot chariot, Texture2D blank, Game1 parent)
         {
+            this.parent = parent;
+            tabValeurBoule = new int[] { 10, 20, 30, -10, -20, -30 };
             posTxt = new Vector2((Game1.FENETRE.Width / 2), Game1.FENETRE.Height / 2);
+            posScore = new Vector2(50, 50);
             createBodies(world, sol, blank);
             rdmCanon = new Random();
             tabPosCanon = posCanon;
@@ -38,6 +45,7 @@ namespace Game1
         public void loadContent(Microsoft.Xna.Framework.Content.ContentManager content)
         {
             fontScore = content.Load<SpriteFont>("font/candy");
+            fontInfo = content.Load<SpriteFont>("font/info");
 
             tabT2Dboule[0] = content.Load<Texture2D>("images/" + Game1.THEME + "/1");
             tabT2Dboule[1] = content.Load<Texture2D>("images/" + Game1.THEME + "/2");
@@ -65,6 +73,9 @@ namespace Game1
         {
             if (time < 1)
                 spriteBatch.DrawString(fontScore, strPoint, posTxt, Color.Black);
+
+            spriteBatch.DrawString(fontInfo, score.ToString(), posScore, Color.White);
+
             for (int i = 0; i < tabBboule.Length; i++)
             {
                 tabBboule[i].draw(spriteBatch, fontScore);
@@ -82,10 +93,39 @@ namespace Game1
             time += gameTime.ElapsedGameTime.TotalSeconds;
         }
 
-        public void showPoint(string txt)
+        public void addPoint(int id)
         {
-            strPoint = txt;
+            if (time < 1)
+                currentScore += tabValeurBoule[id];
+            else
+                currentScore = tabValeurBoule[id];
+
+            score += tabValeurBoule[id];
+
+            if (score < 0)
+                score = 0;
             time = 0;
+            strPoint = currentScore.ToString();
+            if(score >= SCORE_MAX)
+            {
+                endGame();
+            }
+        }
+
+        public void endGame()
+        {
+            
+        }
+
+        public void gameOver()
+        {
+            chariot.explose();
+            this.parent.setGameState(GameState.GameOver);
+        }
+
+        public void addBonus()
+        {
+
         }
 
         public void launchBoule(int idCanon, int idBoule, int direction, int maxW, int maxH)
@@ -109,16 +149,15 @@ namespace Game1
                     int idCanon = rdmCanon.Next(4);
                     int idBoule = rdmCanon.Next(8);
                     int direction, maxH, maxW;
-                    if(idCanon > 1)
+                    direction = idCanon > 1 ? -1 : 1;
+                    if (idCanon == 0 || idCanon == 2)
                     {
-                        direction = -1;
                         maxH = 3;
                         maxW = 5;
                     }
                     else
                     {
-                        direction = 1;
-                        maxH = 5;
+                        maxH = 4;
                         maxW = 6;
                     }
 
