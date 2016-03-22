@@ -475,17 +475,6 @@
 /processorParam:TextureFormat=Color
 /build:images/mouse.png
 
-#begin images/SoftSmokey.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:TextureFormat=Color
-/build:images/SoftSmokey.png
-
 #begin images/menu/arcade.png
 /importer:TextureImporter
 /processor:TextureProcessor
