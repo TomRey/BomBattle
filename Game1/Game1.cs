@@ -267,10 +267,10 @@ namespace Game1
             gameState = GameState.Multi;
             FormMulti form = new FormMulti(this.Window.ClientBounds);
             form.ShowDialog();
-            if(form.DialogResult == System.Windows.Forms.DialogResult.OK)
+            /*if(form.DialogResult == System.Windows.Forms.DialogResult.OK)
             {
                 gameState = GameState.Game;
-            }
+            }*/
             System.Diagnostics.Debug.WriteLine(form.Pseudo);
         }
 
