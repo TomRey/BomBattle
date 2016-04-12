@@ -66,7 +66,7 @@ namespace Game1
             switch (i)
             {
                 case 0:
-                    //parent.startArcade();
+                    //parent.replay();
                     break;
                 case 1:
                     parent.save();
