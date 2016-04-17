@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AnimatedGif.cs" />
     <Compile Include="Arcade.cs" />
+    <Compile Include="Bonus.cs" />
     <Compile Include="Boule.cs" />
     <Compile Include="BouleManager.cs" />
     <Compile Include="Canon.cs" />
@@ -62,12 +63,19 @@
     <Compile Include="FormArcade.Designer.cs">
       <DependentUpon>FormArcade.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormClassement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormClassement.Designer.cs">
+      <DependentUpon>FormClassement.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMulti.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormMulti.Designer.cs">
       <DependentUpon>FormMulti.cs</DependentUpon>
     </Compile>
+    <Compile Include="FrameCounter.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameOver.cs" />
     <Compile Include="Joueur.cs" />
@@ -113,6 +121,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormArcade.resx">
       <DependentUpon>FormArcade.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormClassement.resx">
+      <DependentUpon>FormClassement.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMulti.resx">
       <DependentUpon>FormMulti.cs</DependentUpon>

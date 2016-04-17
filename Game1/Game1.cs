@@ -17,7 +17,6 @@ namespace Game1
     {
         Menu,
         Multi,
-        Settings,
         Game,
         GameOver
     };
@@ -31,6 +30,7 @@ namespace Game1
         SpriteBatch spriteBatch;
         public static Rectangle FENETRE;
         public static float METERINPIXEL = 64f;
+        public static string CLASSEMENT_PATH = @"c:\temp\classement.txt";
         public const string THEME = "wood";
         const int MOUSE_HEIGT = 35;
         const int MOUSE_WIDTH = 30;
@@ -38,7 +38,7 @@ namespace Game1
         const int MOUSE_HEIGHT_2 = MOUSE_HEIGT / 2;
 
         Texture2D t2Dwall, t2Dmouse;
-
+        Vector2 posFps;
         World world;
         Body sol, gauche, droite;
         Chariot chariot;
@@ -54,9 +54,10 @@ namespace Game1
         Menu menu;
         GameOver gameOver;
 
-
+        Arcade arcade;
         GameState gameState;
-
+        private FrameCounter _frameCounter;
+        SpriteFont fontInfo;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -66,8 +67,9 @@ namespace Game1
             //Creation d'un nouveau monde en lui assignant une gravité
             world = new World(new Vector2(0, 20));
             gameState = GameState.Menu;
+            _frameCounter = new FrameCounter();
 
-        }
+    }
 
         public void launchBoule(int idCanon, int idBoule, int direction, int maxW, int maxH)
         {
@@ -116,10 +118,12 @@ namespace Game1
             droite.CollisionCategories = Category.Cat1;
             #endregion
 
+            posFps = new Vector2(FENETRE.Width - 100, 10);
+
             chariot = new Chariot(world);
             canon = new Canon();
-            manager = new BouleManager(world, canon.getPosCanon(), sol, chariot, new Texture2D(GraphicsDevice, 1, 1), this);
-
+            manager = new BouleManager(world, canon.getPosCanon(), sol, chariot, this);
+            arcade = new Arcade(manager);
             base.Initialize();
         }
 
@@ -131,6 +135,7 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            fontInfo = Content.Load<SpriteFont>("font/info");
             t2Dwall = Content.Load<Texture2D>("images/wood/wall");
             t2Dmouse = Content.Load<Texture2D>("images/mouse");
             menu.loadContent(Content);
@@ -138,6 +143,7 @@ namespace Game1
             canon.loadContent(Content);
             chariot.loadContent(Content);
             manager.loadContent(Content);
+            arcade.loadContent(Content);
         }
 
         /// <summary>
@@ -179,6 +185,9 @@ namespace Game1
             else
                 HandleKeyboard();
 
+            if (gameState == GameState.Game)
+                arcade.update(gameTime);
+
             chariot.update(gameTime.ElapsedGameTime);
             manager.update(gameTime);
 
@@ -209,7 +218,8 @@ namespace Game1
 
             if (kbState.IsKeyDown(Keys.Space))
             {
-                manager.launchBoule();
+                //manager.launchBoule();
+                manager.launchBoule(1, 5, 1, 3, 3);
             }
         }
 
@@ -220,9 +230,14 @@ namespace Game1
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            _frameCounter.Update(deltaTime);
+
+            string fps = ""+ Math.Round(_frameCounter.AverageFramesPerSecond);
 
             spriteBatch.Begin();
-            
+
             if (gameState == GameState.Menu)
             {
                 menu.draw(spriteBatch);
@@ -235,6 +250,7 @@ namespace Game1
                 canon.draw(spriteBatch);
                 manager.draw(spriteBatch);
                 chariot.draw(spriteBatch);
+                arcade.draw(spriteBatch);
             }
 
             if (gameState == GameState.GameOver)
@@ -246,7 +262,7 @@ namespace Game1
                 chariot.draw(spriteBatch);
                 spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
             }
-
+            spriteBatch.DrawString(fontInfo, fps, posFps, Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -254,6 +270,20 @@ namespace Game1
 
         public void startArcade()
         {
+            gameState = GameState.Game;
+            arcade.start();
+        }
+
+        public void replay()
+        {
+            chariot.reset();
+            gameState = GameState.Game;
+            arcade.start();
+        }
+
+        public void backToMenu()
+        {
+            chariot.reset();
             gameState = GameState.Game;
         }
 
@@ -275,7 +305,6 @@ namespace Game1
 
         public void startSettings()
         {
-            gameState = GameState.Settings;
         }
 
         public void showMenu()
@@ -285,10 +314,11 @@ namespace Game1
 
         public void save()
         {
-            FormArcade form = new FormArcade(this.Window.ClientBounds);
+            FormArcade form = new FormArcade(this.Window.ClientBounds, manager.score);
             form.ShowDialog();
             if (form.DialogResult == System.Windows.Forms.DialogResult.OK)
             {
+                chariot.reset();
                 gameState = GameState.Menu;
             }
             System.Diagnostics.Debug.WriteLine(form.Pseudo);

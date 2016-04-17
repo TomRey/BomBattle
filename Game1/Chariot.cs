@@ -22,10 +22,11 @@ namespace Game1
         const int ROUE_SIZE = 50;
         const int PANIER_WIDTH = 200;
         const int PANIER_HEIGHT = 100;
-        Vector2 panierOrigin, roueOrigin, impulsion;
+        Vector2 panierOrigin, roueOrigin, impulsion, vitesseNormal, vitesseRalentie;
         Joint jointRoue;
         World world;
         bool gameOver { get; set; }
+        int inverse = 1;
 
         public Chariot(World world)
         {
@@ -33,7 +34,9 @@ namespace Game1
             this.world = world;
             panierOrigin = new Vector2(PANIER_WIDTH / 2f, PANIER_HEIGHT);
             roueOrigin = new Vector2(ROUE_SIZE / 2f, ROUE_SIZE / 2f);
-            impulsion = new Vector2(2f, 0f);
+            vitesseNormal = new Vector2(2f, 0f);
+            vitesseRalentie = new Vector2(0.5f, 0f);
+            impulsion = vitesseNormal;
             explosionGif = new AnimatedGif("images/explosion/", 89, true);
             explosionGif.FrameDuration = 0.02;
             explosionGif.Loop = false;
@@ -107,10 +110,25 @@ namespace Game1
         {
             /*bRoueG.FixedRotation = false;
             bRoueD.FixedRotation = false;*/
-            bRoueG.ApplyTorque(direction * 8f);
-            bRoueD.ApplyTorque(direction * 8f);
+            bRoueG.ApplyTorque(direction * 8f * inverse);
+            bRoueD.ApplyTorque(direction * 8f * inverse);
 
-            tabBpanier[0].ApplyLinearImpulse(impulsion * direction);
+            tabBpanier[0].ApplyLinearImpulse(impulsion * direction * inverse);
+        }
+
+        public void invertCommande(int direction)
+        {
+            inverse = direction;
+        }
+
+        public void vRalentie()
+        {
+            impulsion = vitesseRalentie;
+        }
+
+        public void vNormal()
+        {
+            impulsion = vitesseNormal;
         }
 
         public void frein(int direction)
@@ -160,6 +178,23 @@ namespace Game1
         public Body[] getBodies()
         {
             return tabBpanier;
+        }
+
+        public Vector2 getPos()
+        {
+            return tabBpanier[0].Position * Game1.METERINPIXEL;
+        }
+
+        public void reset()
+        {
+            this.world.AddJoint(jointRoue);
+            for (int i = 0; i < tabBpanier.Length; i++)
+                bRoueD.RestoreCollisionWith(tabBpanier[i]);
+
+            explosionGif.stop();
+            fireGif.stop();
+            t2DPanierActif = t2Dpanier;
+            t2DroueActif = t2Droue;
         }
     }
 }

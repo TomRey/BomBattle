@@ -66,13 +66,14 @@ namespace Game1
             switch (i)
             {
                 case 0:
-                    //parent.replay();
+                    parent.replay();
                     break;
                 case 1:
                     parent.save();
                     break;
                 case 2:
-                    //parent.startSettings();
+                    parent.backToMenu();
+                    parent.setGameState(GameState.Menu);
                     break;
             }
         }

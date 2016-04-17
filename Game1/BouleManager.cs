@@ -21,20 +21,25 @@ namespace Game1
         Vector2 posTxt, posScore;
         double time = 2;
         const int SCORE_MAX = 3000;
-        int score = 0;
+        public int score { get; set; }
         int currentScore = 0;
         Game1 parent;
+        public bool bGameOver { get; set; }
+        Bonus bonus;
 
-        public BouleManager(World world, Vector2[] posCanon, Body sol, Chariot chariot, Texture2D blank, Game1 parent)
+        public BouleManager(World world, Vector2[] posCanon, Body sol, Chariot chariot, Game1 parent)
         {
             this.parent = parent;
+            score = 0;
+            bGameOver = false;
             tabValeurBoule = new int[] { 10, 20, 30, -10, -20, -30 };
             posTxt = new Vector2((Game1.FENETRE.Width / 2), Game1.FENETRE.Height / 2);
             posScore = new Vector2(50, 50);
-            createBodies(world, sol, blank);
+            createBodies(world, sol);
             rdmCanon = new Random();
             tabPosCanon = posCanon;
             this.chariot = chariot;
+            bonus = new Bonus(chariot);
             for (int i = 0; i < posCanon.Length; i++)
             {
                 tabPosCanon[i].X /= Game1.METERINPIXEL;
@@ -55,17 +60,20 @@ namespace Game1
             tabT2Dboule[5] = content.Load<Texture2D>("images/" + Game1.THEME + "/6");
             tabT2Dboule[6] = content.Load<Texture2D>("images/" + Game1.THEME + "/bombe");
             tabT2Dboule[7] = content.Load<Texture2D>("images/" + Game1.THEME + "/bonus");
+
             for (int i = 0; i < tabBboule.Length; i++)
             {
                 tabBboule[i].setTexture(tabT2Dboule[7]);
             }
+
+            bonus.loadContent(content);
         }
 
-        private void createBodies(World world, Body sol, Texture2D blank)
+        private void createBodies(World world, Body sol)
         {
             for(int i = 0; i < tabBboule.Length; i++)
             {
-                tabBboule[i] = new Boule(world, sol, blank);
+                tabBboule[i] = new Boule(world, sol);
             }
         }
 
@@ -80,6 +88,8 @@ namespace Game1
             {
                 tabBboule[i].draw(spriteBatch, fontScore);
             }
+
+            bonus.draw(spriteBatch);
         }
 
         public void update(GameTime gameTime)
@@ -88,48 +98,60 @@ namespace Game1
             {
                  tabBboule[i].update(chariot, gameTime, this);
             }
-            posTxt.X = Game1.FENETRE.Width / 2 - (fontScore.MeasureString(strPoint).X / 2);
-            posTxt.Y = Game1.FENETRE.Height / 2 - (fontScore.MeasureString(strPoint).Y / 2);
             time += gameTime.ElapsedGameTime.TotalSeconds;
+
+            bonus.update(gameTime);
         }
 
         public void addPoint(int id)
         {
-            if (time < 1)
-                currentScore += tabValeurBoule[id];
-            else
-                currentScore = tabValeurBoule[id];
+            int scoreBoule = tabValeurBoule[id];
+            if ((bonus.id[0] == 1 || bonus.id[1] == 1) && id > 2)//bonus 1 : point neg doublé
+            {
+                scoreBoule *= 2;
+            }
 
-            score += tabValeurBoule[id];
+            if (time < 1)
+                currentScore += scoreBoule;
+            else
+                currentScore = scoreBoule;
+
+            score += scoreBoule;
 
             if (score < 0)
                 score = 0;
+
             time = 0;
             strPoint = currentScore.ToString();
-            if(score >= SCORE_MAX)
-            {
-                endGame();
-            }
-        }
-
-        public void endGame()
-        {
-            
+            posTxt.X = Game1.FENETRE.Width / 2 - (fontScore.MeasureString(strPoint).X / 2);
+            posTxt.Y = Game1.FENETRE.Height / 2 - (fontScore.MeasureString(strPoint).Y / 2);
         }
 
         public void gameOver()
         {
-            chariot.explose();
-            this.parent.setGameState(GameState.GameOver);
+            if (bonus.nbVie <= 0)
+            {
+                strPoint = "";
+                chariot.explose();
+                this.parent.setGameState(GameState.GameOver);
+            }
+            else
+                bonus.nbVie--;
         }
 
         public void addBonus()
         {
-
+            bonus.newBonus(rdmCanon.Next(89));
         }
 
         public void launchBoule(int idCanon, int idBoule, int direction, int maxW, int maxH)
         {
+            
+            if (bonus.id[0] == 6 || bonus.id[1] == 6)//Bonus 6 : rafale de bombe!
+                idBoule = 6;
+            else if ((bonus.id[0] == 2 || bonus.id[1] == 2) && idBoule < 3)//Bonus 2 : pas de boule positives
+                idBoule = rdmCanon.Next(3, 8);
+
             for (int i = 0; i < tabBboule.Length; i++)
             {
                 if (tabBboule[i].isSleeping())
@@ -160,7 +182,6 @@ namespace Game1
                         maxH = 4;
                         maxW = 6;
                     }
-
                     tabBboule[i].reset(tabPosCanon[idCanon], idBoule, direction, maxW, maxH, tabT2Dboule[idBoule]);
                     break;
                 }

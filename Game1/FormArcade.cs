@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace Game1
 {
@@ -14,16 +15,35 @@ namespace Game1
     {
         public string Pseudo { get; set; }
         Rectangle rect;
+        int score = 0;
 
-        public FormArcade(Rectangle rectWindows)
+        public FormArcade(Rectangle rectWindows, int score)
         {
             InitializeComponent();
             rect = rectWindows;
+            this.score = score;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             Pseudo = tbxPseudo.Text;
+
+            // This text is added only once to the file.
+            if (!File.Exists(Game1.CLASSEMENT_PATH))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(Game1.CLASSEMENT_PATH))
+                {
+                    sw.WriteLine(tbxPseudo.Text + ":" + score);
+                }
+            }
+            else
+            {
+                using (StreamWriter sw = File.AppendText(Game1.CLASSEMENT_PATH))
+                {
+                    sw.WriteLine(tbxPseudo.Text + ":" + score);
+                }
+            }
         }
 
         private void btnAnnuler_Click(object sender, EventArgs e)

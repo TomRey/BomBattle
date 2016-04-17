@@ -2,10 +2,6 @@
 using FarseerPhysics.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGameMPE.Core;
-using MonoGameMPE.Core.Modifiers;
-using MonoGameMPE.Core.Modifiers.Container;
-using MonoGameMPE.Core.Profiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,18 +20,12 @@ namespace Game1
         Vector2 pos, bouleOrigin;
         const int BOULE_SIZE = 45;
 
-        private ParticleEffect particleEffect;
-        private SpriteBatchRenderer particleRenderer;
-        Texture2D _blankTexture;
-
-        public Boule(World world, Body sol, Texture2D blankTexture)
+        public Boule(World world, Body sol)
         {
             pos = new Vector2(0, 0);
             bouleOrigin = new Vector2(BOULE_SIZE / 2f, BOULE_SIZE / 2f);
             rdmPos = new Random();
             createBody(world, sol);
-            _blankTexture = blankTexture;
-            _blankTexture.SetData(new[] { Color.White });
         }
 
         private void createBody(World world, Body sol)
@@ -79,7 +69,6 @@ namespace Game1
         {
             t2D = texture;
             idText2D = id;
-            //ParticleInit();
             sleep = false;
             bBoule.Awake = true;
             bBoule.Enabled = true;
@@ -93,8 +82,6 @@ namespace Game1
 
         public void update(Chariot chariot, GameTime gameTime, BouleManager parent)
         {
-            // particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            // particleEffect.Trigger(new Vector(100, 100));
             Body[] chariotBodies = chariot.getBodies();
             if (!sleep)
             {
@@ -130,52 +117,8 @@ namespace Game1
 
         public void draw(SpriteBatch spriteBatch, SpriteFont fontScore)
         {
-            spriteBatch.Draw(t2D, bBoule.Position * Game1.METERINPIXEL, null, Color.White, bBoule.Rotation, bouleOrigin, 1f, SpriteEffects.None, 0f);
-            
-            //particleRenderer.Draw(particleEffect, spriteBatch);
-            
-        }
-
-        private void ParticleInit()
-        {
-            particleRenderer = new SpriteBatchRenderer();
-
-            particleEffect = new ParticleEffect
-            {
-                Emitters = new[]
-                {
-                    new Emitter(2000, TimeSpan.FromSeconds(2), Profile.Point())
-                    {
-                        Texture = _blankTexture,
-                        BlendMode = BlendMode.Alpha,
-                        Parameters = new ReleaseParameters
-                        {
-                            Speed = new RangeF(20f, 50f),
-                            Quantity = 3,
-                            
-                        },
-                        Modifiers = new IModifier[]
-                        {
-                            new ColourInterpolator2
-                            {
-                                InitialColour = new Colour(0.0f, 0.0f, 0.5f),
-                                FinalColour = new Colour(0.0f, 0.0f, 0.5f)
-                            },
-                            new RotationModifier
-                            {
-                                RotationRate = 1f
-                            },
-                            new RectContainerModifier
-                            {
-                                Height = 500,
-                                Width = 500,
-                            },
-                        }
-                    }
-
-                }
-            };
-
+            if(!sleep)
+                spriteBatch.Draw(t2D, bBoule.Position * Game1.METERINPIXEL, null, Color.White, bBoule.Rotation, bouleOrigin, 1f, SpriteEffects.None, 0f);        
         }
     }
 }

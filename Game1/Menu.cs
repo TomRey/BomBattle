@@ -21,8 +21,8 @@ namespace Game1
         public Menu(Game1 parent)
         {
             this.parent = parent;
-            tabT2Dbouton = new Texture2D[4];
-            rectBouton = new Rectangle[4];
+            tabT2Dbouton = new Texture2D[5];
+            rectBouton = new Rectangle[5];
             rectWallpaper = new Rectangle(0, 0, Game1.FENETRE.Width, Game1.FENETRE.Height);
         }
 
@@ -34,11 +34,13 @@ namespace Game1
             tabT2Dbouton[1] = content.Load<Texture2D>("images/menu/multi");
             tabT2Dbouton[2] = content.Load<Texture2D>("images/menu/options");
             tabT2Dbouton[3] = content.Load<Texture2D>("images/menu/quitter");
-
+            tabT2Dbouton[4] = content.Load<Texture2D>("images/menu/classement");
             rectTitre = new Rectangle(Game1.FENETRE.Width / 2 - t2Dtitre.Width / 2, 50, t2Dtitre.Width, t2Dtitre.Height);
+           
             int space = (Game1.FENETRE.Width - 4 * tabT2Dbouton[0].Width) / 4;
-            for (int i = 0; i < tabT2Dbouton.Length; i++)
+            for (int i = 0; i < tabT2Dbouton.Length-1; i++)
                 rectBouton[i] = new Rectangle(space + (i * tabT2Dbouton[i].Width + space), 600, tabT2Dbouton[i].Width, tabT2Dbouton[i].Height);
+            rectBouton[4] = new Rectangle(rectBouton[0].X, rectBouton[0].Height + rectBouton[0].Y, tabT2Dbouton[4].Width, tabT2Dbouton[4].Height);
 
         }
 
@@ -80,6 +82,10 @@ namespace Game1
                     break;
                 case 3:
                     parent.Exit();
+                    break;
+                case 4:
+                    FormClassement form = new FormClassement();
+                    form.ShowDialog();
                     break;
             }
         }

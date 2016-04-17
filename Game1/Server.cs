@@ -73,11 +73,11 @@ namespace Game1
         public void SendData(object ms)
         {
             int[] tab = ms as int[];
+            int direction, H, W = 0;
+            int idCanon = tab[1];
             while (quit != true)
             {
-                int idCanon = tab[1];
-                int idBoule = rdm.Next(8);
-                int direction, H, W;
+                int idBoule = rdm.Next(8);                
                 direction = idCanon > 1 ? -1 : 1;
                 if (idCanon == 0 || idCanon == 2)
                 {
@@ -89,14 +89,16 @@ namespace Game1
                     H = 5;
                     W = 6;
                 }
+
                 int maxW = rdm.Next(1, W);
                 int maxH = rdm.Next(1, H);
+                System.Diagnostics.Debug.WriteLine("send: "+ maxH +"");
                 foreach (KeyValuePair<string, Joueur> joueur in clientTCP)
                 {
                     if (!joueur.Value.finish)
                     {
                         NetworkStream serverStream = joueur.Value.client.GetStream();
-                        byte[] outStream = Encoding.ASCII.GetBytes(idCanon + "#" + idBoule + "#" + direction + "#" + maxW + "#" + maxH);
+                        byte[] outStream = Encoding.ASCII.GetBytes(idCanon + "a" + idBoule + "a" + direction + "a" + maxW + "a" + maxH + "a");
                         serverStream.Write(outStream, 0, outStream.Length);
                         serverStream.Flush();
                     }

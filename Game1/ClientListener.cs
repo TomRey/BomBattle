@@ -19,8 +19,10 @@ namespace Game1
         public override void actionResult(string data)
         {
             parent.setGame(data);
-            string[] value = data.Split('#');
+            string[] value = data.Split('a');
             game.launchBoule(int.Parse(value[0]), int.Parse(value[1]), int.Parse(value[2]), int.Parse(value[3]), int.Parse(value[4]));
+            // System.Diagnostics.Debug.WriteLine(value[0] +" | " + value[1] + " | " + value[2] + " | " + value[3] + " | " + value[4]);
+            System.Diagnostics.Debug.WriteLine("recept: " + value[4]);
         }
     }
 }

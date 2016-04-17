@@ -17,10 +17,10 @@ namespace Game1
 
         public Canon()
         {
-            tabPosCanon[0] = new Vector2(CANON_WIDTH / 2, (Game1.FENETRE.Height / 4) - (CANON_HEIGHT / 2));
-            tabPosCanon[1] = new Vector2(CANON_WIDTH / 2, (Game1.FENETRE.Height / 2) + (CANON_HEIGHT / 2));
-            tabPosCanon[2] = new Vector2(Game1.FENETRE.Width - (int)(CANON_WIDTH * 1.5), (Game1.FENETRE.Height / 4) - (CANON_HEIGHT / 2));
-            tabPosCanon[3] = new Vector2(Game1.FENETRE.Width - (int)(CANON_WIDTH * 1.5), (Game1.FENETRE.Height / 2) + (CANON_HEIGHT / 2));
+            tabPosCanon[0] = new Vector2(CANON_WIDTH / 2, (Game1.FENETRE.Height / 2) - (CANON_HEIGHT / 2));
+            tabPosCanon[1] = new Vector2(CANON_WIDTH / 2+200, (Game1.FENETRE.Height / 2) + (CANON_HEIGHT / 2)+100);
+            tabPosCanon[2] = new Vector2(Game1.FENETRE.Width - (int)(CANON_WIDTH * 1.5), (Game1.FENETRE.Height / 2) - (CANON_HEIGHT / 2));
+            tabPosCanon[3] = new Vector2(Game1.FENETRE.Width - (int)(CANON_WIDTH * 1.5)-200, (Game1.FENETRE.Height / 2) + (CANON_HEIGHT / 2)+100);
 
             tabRectCanon[0] = new Rectangle((int)tabPosCanon[0].X, (int)tabPosCanon[0].Y, CANON_WIDTH, CANON_HEIGHT);
             tabRectCanon[1] = new Rectangle((int)tabPosCanon[1].X, (int)tabPosCanon[1].Y, CANON_WIDTH, CANON_HEIGHT);
