@@ -3,6 +3,7 @@ using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Joints;
 using FarseerPhysics.Factories;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -18,6 +19,7 @@ namespace Game1
         Body[] tabBpanier = new Body[3]; //bChariotG, bChariotD, bChariotB, 
         Body bRoueG, bRoueD;
         AnimatedGif explosionGif, fireGif;
+        SoundEffect bombe;
 
         const int ROUE_SIZE = 50;
         const int PANIER_WIDTH = 200;
@@ -27,9 +29,11 @@ namespace Game1
         World world;
         bool gameOver { get; set; }
         int inverse = 1;
+        public bool IsExplose  { get; set;}
 
         public Chariot(World world)
         {
+            IsExplose = false;
             createBodies(world);
             this.world = world;
             panierOrigin = new Vector2(PANIER_WIDTH / 2f, PANIER_HEIGHT);
@@ -46,6 +50,7 @@ namespace Game1
 
         public void loadContent(ContentManager content)
         {
+            bombe = content.Load<SoundEffect>("son/boom");
             t2Dpanier = content.Load<Texture2D>("images/"+ Game1.THEME + "/panier");
             t2DpanierGameOver = content.Load<Texture2D>("images/" + Game1.THEME + "/panier2");
             t2Droue = content.Load<Texture2D>("images/" + Game1.THEME + "/roue");
@@ -141,6 +146,7 @@ namespace Game1
 
         public void explose()
         {
+            bombe.Play();
             explosionGif.start();
             fireGif.start();
             t2DPanierActif = t2DpanierGameOver;
@@ -151,6 +157,7 @@ namespace Game1
                 bRoueD.IgnoreCollisionWith(tabBpanier[i]);
             bRoueD.ApplyTorque(10f);
             bRoueD.ApplyLinearImpulse(new Vector2(1f, 2f));
+            IsExplose = true;
 
         }
 
@@ -195,6 +202,7 @@ namespace Game1
             fireGif.stop();
             t2DPanierActif = t2Dpanier;
             t2DroueActif = t2Droue;
+            IsExplose = false;
         }
     }
 }

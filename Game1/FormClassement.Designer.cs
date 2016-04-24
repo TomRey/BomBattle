@@ -41,7 +41,7 @@
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "FormClassement";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormClassement";
             this.Load += new System.EventHandler(this.FormClassement_Load);
             this.ResumeLayout(false);

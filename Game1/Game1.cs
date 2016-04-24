@@ -18,7 +18,8 @@ namespace Game1
         Menu,
         Multi,
         Game,
-        GameOver
+        GameOver,
+        GameOverMulti
     };
 
     /// <summary>
@@ -53,11 +54,13 @@ namespace Game1
         Rectangle rectWallpaper;
         Menu menu;
         GameOver gameOver;
-
+        Multi multi;
         Arcade arcade;
-        GameState gameState;
+        public GameState gameState{ get; set; }
         private FrameCounter _frameCounter;
         SpriteFont fontInfo;
+        Song sonMenu, sonJeu;
+        SongCollection songCollection;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -85,8 +88,11 @@ namespace Game1
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            graphics.PreferredBackBufferWidth = 1920;//System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
-            graphics.PreferredBackBufferHeight = 1000;//System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
+            graphics.PreferredBackBufferWidth = 1600;
+            graphics.PreferredBackBufferHeight = 1000;
+            //pour fullscreen
+            //graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            //graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
 
@@ -124,6 +130,9 @@ namespace Game1
             canon = new Canon();
             manager = new BouleManager(world, canon.getPosCanon(), sol, chariot, this);
             arcade = new Arcade(manager);
+            multi = new Multi(this, manager, chariot);
+            
+            MediaPlayer.IsRepeating = true;
             base.Initialize();
         }
 
@@ -134,16 +143,23 @@ namespace Game1
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
+            
             spriteBatch = new SpriteBatch(GraphicsDevice);
             fontInfo = Content.Load<SpriteFont>("font/info");
             t2Dwall = Content.Load<Texture2D>("images/wood/wall");
             t2Dmouse = Content.Load<Texture2D>("images/mouse");
+            sonMenu = Content.Load<Song>("son/menu");
+            sonJeu = Content.Load<Song>("son/jeu");
+
             menu.loadContent(Content);
             gameOver.loadContent(Content);
             canon.loadContent(Content);
             chariot.loadContent(Content);
             manager.loadContent(Content);
             arcade.loadContent(Content);
+            multi.loadContent(Content);
+            
+            MediaPlayer.Play(sonMenu);
         }
 
         /// <summary>
@@ -162,11 +178,6 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-
             ms = Mouse.GetState();
             rectMouse.X = ms.X - MOUSE_WIDTH_2;
             rectMouse.Y = ms.Y - MOUSE_HEIGHT_2;
@@ -182,7 +193,19 @@ namespace Game1
                 gameOver.update(ms, lastms);
                 lastms = ms;
             }
-            else
+
+            if (gameState == GameState.GameOverMulti)
+            {
+                multi.update(ms, lastms);
+                lastms = ms;
+            }
+
+            if (gameState == GameState.Multi)
+            {
+                multi.update(gameTime);
+            }
+
+            if (gameState != GameState.GameOver && gameState != GameState.GameOverMulti)
                 HandleKeyboard();
 
             if (gameState == GameState.Game)
@@ -221,6 +244,11 @@ namespace Game1
                 //manager.launchBoule();
                 manager.launchBoule(1, 5, 1, 3, 3);
             }
+
+            if(gameState == GameState.Multi)
+            {
+                multi.handleKeyboard(kbState);
+            }
         }
 
         /// <summary>
@@ -253,6 +281,15 @@ namespace Game1
                 arcade.draw(spriteBatch);
             }
 
+            if (gameState == GameState.Multi)
+            {
+                spriteBatch.Draw(t2Dwall, rectWallpaper, Color.White);
+                canon.draw(spriteBatch);
+                manager.draw(spriteBatch);
+                chariot.draw(spriteBatch);
+                multi.draw(spriteBatch);
+            }
+
             if (gameState == GameState.GameOver)
             {
                 spriteBatch.Draw(t2Dwall, rectWallpaper, Color.White);
@@ -262,7 +299,18 @@ namespace Game1
                 chariot.draw(spriteBatch);
                 spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
             }
-            spriteBatch.DrawString(fontInfo, fps, posFps, Color.White);
+
+            if (gameState == GameState.GameOverMulti)
+            {
+                spriteBatch.Draw(t2Dwall, rectWallpaper, Color.White);
+                canon.draw(spriteBatch);
+                manager.draw(spriteBatch);
+                chariot.draw(spriteBatch);
+                multi.draw(spriteBatch);
+                spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
+            }
+
+            spriteBatch.DrawString(fontInfo, fps, posFps, Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -272,6 +320,7 @@ namespace Game1
         {
             gameState = GameState.Game;
             arcade.start();
+            startSonJeu();
         }
 
         public void replay()
@@ -279,47 +328,59 @@ namespace Game1
             chariot.reset();
             gameState = GameState.Game;
             arcade.start();
+            startSonJeu();
         }
 
         public void backToMenu()
         {
             chariot.reset();
-            gameState = GameState.Game;
-        }
-
-        public void setGameState(GameState state)
-        {
-            gameState = state;
+            gameState = GameState.Menu;
+            startSon();
         }
 
         public void startMulti()
         {
-            FormMulti form = new FormMulti(this.Window.ClientBounds);
-            form.ShowDialog();
-            if(form.DialogResult == System.Windows.Forms.DialogResult.OK)
-            {
-                gameState = GameState.Game;
-            }
-            System.Diagnostics.Debug.WriteLine(form.Pseudo);
+            multi.start();
+        }
+
+        public void addBonus(int id)
+        {
+            multi.addBonus(id);
         }
 
         public void startSettings()
         {
         }
 
-        public void showMenu()
+        public void gameOverMulti()
         {
-            gameState = GameState.Menu;
+            multi.sendFinish();
+        }
+
+        public void sendWinner()
+        {
+            multi.sendWinner();
+        }
+
+        public void startSon()
+        {
+            MediaPlayer.Play(sonMenu);
+        }
+
+        public void startSonJeu()
+        {
+            MediaPlayer.Play(sonJeu);
         }
 
         public void save()
         {
-            FormArcade form = new FormArcade(this.Window.ClientBounds, manager.score);
+            FormArcade form = new FormArcade(manager.score);
             form.ShowDialog();
             if (form.DialogResult == System.Windows.Forms.DialogResult.OK)
             {
                 chariot.reset();
                 gameState = GameState.Menu;
+                startSon();
             }
             System.Diagnostics.Debug.WriteLine(form.Pseudo);
         }      

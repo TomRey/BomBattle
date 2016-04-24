@@ -1,5 +1,6 @@
 ﻿using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -20,12 +21,13 @@ namespace Game1
         string strPoint = "";
         Vector2 posTxt, posScore;
         double time = 2;
-        const int SCORE_MAX = 3000;
+        const int SCORE_MAX = 1500;
         public int score { get; set; }
         int currentScore = 0;
         Game1 parent;
         public bool bGameOver { get; set; }
         Bonus bonus;
+        SoundEffect sonPoint, sonBonus;
 
         public BouleManager(World world, Vector2[] posCanon, Body sol, Chariot chariot, Game1 parent)
         {
@@ -51,7 +53,8 @@ namespace Game1
         {
             fontScore = content.Load<SpriteFont>("font/candy");
             fontInfo = content.Load<SpriteFont>("font/info");
-
+            sonPoint = content.Load<SoundEffect>("son/chtonk");
+            sonBonus = content.Load<SoundEffect>("son/bonus");
             tabT2Dboule[0] = content.Load<Texture2D>("images/" + Game1.THEME + "/1");
             tabT2Dboule[1] = content.Load<Texture2D>("images/" + Game1.THEME + "/2");
             tabT2Dboule[2] = content.Load<Texture2D>("images/" + Game1.THEME + "/3");
@@ -67,6 +70,19 @@ namespace Game1
             }
 
             bonus.loadContent(content);
+        }
+
+        public void reset()
+        {
+            bGameOver = false;
+            score = 0;
+            strPoint = "";
+            bonus.reset();
+        }
+
+        public string getPlayerData()
+        {
+            return score + "#" + bonus.nbVie + "#" + bonus.nbBonus + "#" + bGameOver;
         }
 
         private void createBodies(World world, Body sol)
@@ -105,43 +121,94 @@ namespace Game1
 
         public void addPoint(int id)
         {
-            int scoreBoule = tabValeurBoule[id];
-            if ((bonus.id[0] == 1 || bonus.id[1] == 1) && id > 2)//bonus 1 : point neg doublé
+            if (!bGameOver)
             {
-                scoreBoule *= 2;
+                int scoreBoule = tabValeurBoule[id];
+                if ((bonus.id[0] == 1 || bonus.id[1] == 1) && id > 2)//bonus 1 : point neg doublé
+                {
+                    scoreBoule *= 2;
+                }
+
+                if (time < 1)
+                    currentScore += scoreBoule;
+                else
+                    currentScore = scoreBoule;
+
+                score += scoreBoule;
+
+                if (score < 0)
+                    score = 0;
+
+                if (parent.gameState == GameState.Multi && score >= SCORE_MAX)
+                {
+                    bGameOver = true;
+                    parent.sendWinner();
+                }
+
+                time = 0;
+                strPoint = currentScore.ToString();
+                posTxt.X = Game1.FENETRE.Width / 2 - (fontScore.MeasureString(strPoint).X / 2);
+                posTxt.Y = Game1.FENETRE.Height / 2 - (fontScore.MeasureString(strPoint).Y / 2);
+                sonPoint.Play();
             }
-
-            if (time < 1)
-                currentScore += scoreBoule;
-            else
-                currentScore = scoreBoule;
-
-            score += scoreBoule;
-
-            if (score < 0)
-                score = 0;
-
-            time = 0;
-            strPoint = currentScore.ToString();
-            posTxt.X = Game1.FENETRE.Width / 2 - (fontScore.MeasureString(strPoint).X / 2);
-            posTxt.Y = Game1.FENETRE.Height / 2 - (fontScore.MeasureString(strPoint).Y / 2);
         }
 
         public void gameOver()
         {
-            if (bonus.nbVie <= 0)
+            if (!bGameOver)
             {
-                strPoint = "";
-                chariot.explose();
-                this.parent.setGameState(GameState.GameOver);
+                if (bonus.nbVie <= 0)
+                {
+                    strPoint = "";
+                    chariot.explose();
+                    if (parent.gameState == GameState.Multi)
+                    {
+                        parent.gameOverMulti();
+                        bGameOver = true;
+
+                    }
+                    else
+                    {
+                        this.parent.gameState = GameState.GameOver;
+                        bGameOver = true;
+                    }
+                }
+                else
+                    bonus.nbVie--;
             }
-            else
-                bonus.nbVie--;
         }
 
         public void addBonus()
         {
-            bonus.newBonus(rdmCanon.Next(89));
+            if (!bGameOver)
+            {
+                sonBonus.Play();
+                int idBonus = rdmCanon.Next(89);
+                if (parent.gameState == GameState.Multi)
+                {
+                    if (idBonus >= 60 && idBonus <= 69)//4)
+                    {
+                        bonus.newBonus(idBonus);
+                    }
+                    else
+                    {
+                        parent.addBonus(idBonus);
+                        bonus.setBonusDispo(idBonus);
+                    }
+                }
+                else
+                    bonus.newBonus(idBonus);
+            }
+        }
+
+        public void activeBonus(int idBonus)
+        {
+            bonus.newBonus(idBonus);
+        }
+
+        public void removeBonusDispo()
+        {
+            bonus.removeBonusDispo();
         }
 
         public void launchBoule(int idCanon, int idBoule, int direction, int maxW, int maxH)

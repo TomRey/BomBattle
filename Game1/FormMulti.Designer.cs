@@ -37,6 +37,7 @@
             this.rdbHote = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.rdbClient = new System.Windows.Forms.RadioButton();
+            this.lblErreur = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,7 +82,6 @@
             // btnCreer
             // 
             this.btnCreer.BackColor = System.Drawing.Color.LightSteelBlue;
-            this.btnCreer.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnCreer.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnCreer.Font = new System.Drawing.Font("Open Sans Light", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCreer.Location = new System.Drawing.Point(152, 233);
@@ -115,7 +115,7 @@
             this.rdbHote.Location = new System.Drawing.Point(23, 35);
             this.rdbHote.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rdbHote.Name = "rdbHote";
-            this.rdbHote.Size = new System.Drawing.Size(100, 32);
+            this.rdbHote.Size = new System.Drawing.Size(86, 23);
             this.rdbHote.TabIndex = 7;
             this.rdbHote.TabStop = true;
             this.rdbHote.Text = "Heberger";
@@ -143,20 +143,27 @@
             this.rdbClient.Location = new System.Drawing.Point(131, 35);
             this.rdbClient.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rdbClient.Name = "rdbClient";
-            this.rdbClient.Size = new System.Drawing.Size(99, 32);
+            this.rdbClient.Size = new System.Drawing.Size(85, 23);
             this.rdbClient.TabIndex = 8;
             this.rdbClient.Text = "Rejoindre";
             this.rdbClient.UseVisualStyleBackColor = true;
             // 
+            // lblErreur
+            // 
+            this.lblErreur.ForeColor = System.Drawing.Color.OrangeRed;
+            this.lblErreur.Location = new System.Drawing.Point(12, 280);
+            this.lblErreur.Name = "lblErreur";
+            this.lblErreur.Size = new System.Drawing.Size(263, 23);
+            this.lblErreur.TabIndex = 9;
+            // 
             // FormMulti
             // 
-            this.AcceptButton = this.btnCreer;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.CancelButton = this.btnRetour;
-            this.ClientSize = new System.Drawing.Size(292, 296);
+            this.ClientSize = new System.Drawing.Size(292, 312);
             this.ControlBox = false;
+            this.Controls.Add(this.lblErreur);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnRetour);
             this.Controls.Add(this.btnCreer);
@@ -168,6 +175,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FormMulti";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormMulti";
             this.Load += new System.EventHandler(this.FormMulti_Load);
             this.groupBox1.ResumeLayout(false);
@@ -188,5 +196,6 @@
         private System.Windows.Forms.RadioButton rdbHote;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton rdbClient;
+        private System.Windows.Forms.Label lblErreur;
     }
 }

@@ -14,13 +14,11 @@ namespace Game1
     public partial class FormArcade : Form
     {
         public string Pseudo { get; set; }
-        Rectangle rect;
         int score = 0;
 
-        public FormArcade(Rectangle rectWindows, int score)
+        public FormArcade(int score)
         {
             InitializeComponent();
-            rect = rectWindows;
             this.score = score;
         }
 
@@ -53,7 +51,6 @@ namespace Game1
 
         private void FormArcade_Load(object sender, EventArgs e)
         {
-            this.Location = new System.Drawing.Point( + (rect.Width / 2) - (this.Width / 2), rect.Y + rect.Height / 2 - (this.Height / 2));
         }
     }
 }

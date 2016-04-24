@@ -17,22 +17,30 @@ namespace Game1
 
         public Listener(TcpClient clientConnected, bool loop)
         {
-            this._clientSocket = clientConnected;
             this.loop = loop;
-        }
-
-        public void StartClient()
-        {
+            this._clientSocket = clientConnected;
             _networkStream = _clientSocket.GetStream();
             WaitForRequest();
         }
 
         public void WaitForRequest()
-        {
+        {         
             if (_clientSocket.Connected)
             {
                 byte[] buffer = new byte[_clientSocket.ReceiveBufferSize];
-                _networkStream.BeginRead(buffer, 0, buffer.Length, ReadCallback, buffer);
+                try
+                {
+                    _networkStream.BeginRead(buffer, 0, buffer.Length, ReadCallback, buffer);
+                }
+                catch
+                {
+                    _clientSocket.Close();
+                    loop = false;
+                }
+            }
+            else
+            {
+                loop = false;
             }
         }
 
@@ -42,16 +50,13 @@ namespace Game1
             {
                 NetworkStream networkStream = _clientSocket.GetStream();
                 int read = networkStream.EndRead(result);
-                if (read == 0)
+                if (read != 0)
                 {
-                    _networkStream.Close();
-                    _clientSocket.Close();
-                    return;
-                }
 
-                byte[] buffer = result.AsyncState as byte[];
-                string data = Encoding.Default.GetString(buffer, 0, read);
-                actionResult(data);
+                    byte[] buffer = result.AsyncState as byte[];
+                    string data = Encoding.Default.GetString(buffer, 0, read);
+                    actionResult(data);
+                }
             }
             catch (Exception ex)
             {
@@ -59,11 +64,6 @@ namespace Game1
 
             if (loop)
                 this.WaitForRequest();
-        }
-
-        public void stopLoop()
-        {
-            this.loop = false;
         }
     }
 }

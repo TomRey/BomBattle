@@ -12,22 +12,43 @@ namespace Game1
     {
         TcpClient clientSocket = new TcpClient();
         string pseudo;
-        Form1 parent;
+        Multi parent;
         ClientListener clientReq;
+        bool stop = false;
 
-        public Client(string ip, string name, Form1 parent, Game1 game)
+        public Client(string ip, string name, Multi parent)
         {
             pseudo = name;
             this.parent = parent;
             clientSocket.Connect(ip, 8888);
             SendData(name);
-            clientReq = new ClientListener(clientSocket, true, parent, game);
-            clientReq.StartClient();
+            clientReq = new ClientListener(clientSocket, true, parent);
         }
 
-        public void finish(string message)
+        public void start()
         {
-            SendData(message);
+            Thread th = new Thread(SendDataPlayer);
+            th.Start();
+        }
+
+        public void close()
+        {
+            stop = true;
+            clientSocket.Close();
+        }
+
+        public void SendDataPlayer()
+        {
+            while (!stop)
+            {
+                if (!clientSocket.Connected)
+                    return;
+                NetworkStream serverStream = clientSocket.GetStream();
+                byte[] outStream = System.Text.Encoding.ASCII.GetBytes("2:" + pseudo + "#" + parent.getPlayerData() + ";");
+                serverStream.Write(outStream, 0, outStream.Length);
+                //serverStream.Flush();
+                Thread.Sleep(2000);
+            }
         }
 
         public void SendData(string dataTosend)
@@ -37,12 +58,7 @@ namespace Game1
             NetworkStream serverStream = clientSocket.GetStream();
             byte[] outStream = System.Text.Encoding.ASCII.GetBytes(dataTosend);
             serverStream.Write(outStream, 0, outStream.Length);
-            serverStream.Flush();
-        }
-
-        public void CloseConnection()
-        {
-            clientReq.stopLoop();
+            //serverStream.Flush();
         }
     }
 }

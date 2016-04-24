@@ -26,22 +26,23 @@ namespace Game1
         double[] timer, timerMax;
         public bool active { get; set; }
         public int nbVie { get; set; }
+        public int nbBonus { get; set; }
         Vector2 blackscreenOrigin, posInfo;
-        Texture2D blackScreen, blackScreen2;
+        Texture2D blackScreen, blackScreen2, t2DbonusDispo;
         Texture2D[] t2Dbonus;
         Chariot chariot;
         SpriteFont fontInfo;
         Texture2D[] tabT2Dbonus;
-        Vector2 posBonus, posVie;
-        Vector2[] posBonusDispo;
+        Vector2 posBonusDispo, posVie;
+        Vector2[] posBonusActif;
         int POS_H_VIE = Game1.FENETRE.Height - 75;
-        int nbBonus;
         int lastBonusIDtab;
+
         public Bonus(Chariot chariot)
         {
             id = new int[2] { -1, -1 };
-            timer = new double[2] { 0, 0 };
-            timerMax = new double[2] { 0, 0 };
+            timer = new double[2] { -1, -1 };
+            timerMax = new double[2] { 10, 10 };
             posInfo = new Vector2(Game1.FENETRE.Width - 300, Game1.FENETRE.Height - 100);
             this.chariot = chariot;
             active = false;
@@ -51,10 +52,10 @@ namespace Game1
             tabT2Dbonus = new Texture2D[8];
             t2Dbonus = new Texture2D[2];
             posVie = new Vector2(Game1.FENETRE.Width - 75, Game1.FENETRE.Height - 75);
-            posBonusDispo = new Vector2[2];
-            posBonusDispo[0] = new Vector2(10, Game1.FENETRE.Height - 75);
-            posBonusDispo[1] = new Vector2(85, Game1.FENETRE.Height - 75);
-            posBonus = new Vector2(10, Game1.FENETRE.Height - 75);
+            posBonusActif = new Vector2[2];
+            posBonusActif[0] = new Vector2(10, Game1.FENETRE.Height - 75);
+            posBonusActif[1] = new Vector2(85, Game1.FENETRE.Height - 75);
+            posBonusDispo = new Vector2(Game1.FENETRE.Width-160, Game1.FENETRE.Height - 75);
         }
 
         public void loadContent(Microsoft.Xna.Framework.Content.ContentManager content)
@@ -72,6 +73,7 @@ namespace Game1
             tabT2Dbonus[7] = content.Load<Texture2D>("images/bonus/bonus7");
             t2Dbonus[0] = tabT2Dbonus[0];
             t2Dbonus[1] = tabT2Dbonus[0];
+            t2DbonusDispo = tabT2Dbonus[0];
             blackscreenOrigin = new Vector2(blackScreen.Width / 2, blackScreen.Height / 2);
         }
 
@@ -98,6 +100,43 @@ namespace Game1
                 timer[1] += gameTime.ElapsedGameTime.TotalSeconds;
         }
 
+        public void removeBonusDispo()
+        {
+            t2DbonusDispo = tabT2Dbonus[0];
+        }
+
+        public void setBonusDispo(int idBonus)
+        {
+            if (idBonus >= 0 && idBonus <= 19) //1)
+            {
+                t2DbonusDispo = tabT2Dbonus[1];
+            }
+            else if (idBonus >= 20 && idBonus <= 39)//2)
+            {
+                t2DbonusDispo = tabT2Dbonus[2];
+            }
+            else if (idBonus >= 40 && idBonus <= 59)//3)
+            {
+                t2DbonusDispo = tabT2Dbonus[3];
+            }
+            else if (idBonus >= 60 && idBonus <= 69)//4)
+            {
+                t2DbonusDispo = tabT2Dbonus[4];
+            }
+            else if (idBonus >= 70 && idBonus <= 79)//5)
+            {
+                t2DbonusDispo = tabT2Dbonus[5];
+            }
+            else if (idBonus >= 80 && idBonus <= 85)//6)
+            {
+                t2DbonusDispo = tabT2Dbonus[6];
+            }
+            else//7)
+            {
+                t2DbonusDispo = tabT2Dbonus[7];
+            }
+        }
+
         public void draw(SpriteBatch spriteBatch)
         {
             if (id[0] == 7 || id[1] == 7)
@@ -113,8 +152,10 @@ namespace Game1
                 posVie.Y -= 75;
             }
 
-            spriteBatch.Draw(t2Dbonus[0], posBonusDispo[0], null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(t2Dbonus[1], posBonusDispo[1], null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(t2Dbonus[0], posBonusActif[0], null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(t2Dbonus[1], posBonusActif[1], null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
+            spriteBatch.Draw(t2DbonusDispo, posBonusDispo, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
         public void resetChariot(int idBonus)
@@ -161,6 +202,21 @@ namespace Game1
                 setBonus(1, bonus);
                 lastBonusIDtab = 1;
             }
+        }
+
+        public void reset()
+        {
+            active = false;
+            nbVie = 0;
+            nbBonus = 0;
+            lastBonusIDtab = 0;
+            timer[0] = -1;
+            timer[1] = -1;
+            t2Dbonus[0] = tabT2Dbonus[0];
+            t2Dbonus[1] = tabT2Dbonus[0];
+            t2DbonusDispo = tabT2Dbonus[0];
+            chariot.vNormal();
+            chariot.invertCommande(1);
         }
 
         public void newBonus(int idBonus)

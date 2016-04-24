@@ -97,6 +97,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FormArcade";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormArcade";
             this.Load += new System.EventHandler(this.FormArcade_Load);
             this.ResumeLayout(false);

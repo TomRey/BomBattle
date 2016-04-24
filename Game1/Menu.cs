@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Game1
 {
@@ -17,7 +18,7 @@ namespace Game1
         Texture2D[] tabT2Dbouton;
         Rectangle[] rectBouton;
         Rectangle rectTitre, rectWallpaper;
-
+        SoundEffect sonBouton;
         public Menu(Game1 parent)
         {
             this.parent = parent;
@@ -28,6 +29,7 @@ namespace Game1
 
         public void loadContent(Microsoft.Xna.Framework.Content.ContentManager content)
         {
+            sonBouton = content.Load<SoundEffect>("son/bouton");
             t2Dwall = content.Load<Texture2D>("images/wood/wall");
             t2Dtitre = content.Load<Texture2D>("images/menu/titre");
             tabT2Dbouton[0] = content.Load<Texture2D>("images/menu/arcade");
@@ -69,6 +71,7 @@ namespace Game1
 
         public void buttonAction(int i)
         {
+            sonBouton.Play();
             switch (i)
             {
                 case 0:

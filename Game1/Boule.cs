@@ -19,7 +19,6 @@ namespace Game1
         Texture2D t2D;
         Vector2 pos, bouleOrigin;
         const int BOULE_SIZE = 45;
-
         public Boule(World world, Body sol)
         {
             pos = new Vector2(0, 0);
@@ -34,7 +33,7 @@ namespace Game1
             bBoule.BodyType = BodyType.Dynamic;
             bBoule.Restitution = 0.1f;
             bBoule.Friction = 1f;
-            bBoule.Mass = 0.2f;
+            //bBoule.Mass = 0.2f;
             bBoule.IsBullet = true;
 
             bBoule.CollisionCategories = Category.Cat3;
@@ -90,7 +89,7 @@ namespace Game1
                     standBy();
                 }
 
-                if (bBoule.Position.X > chariotBodies[1].Position.X && bBoule.Position.X < chariotBodies[2].Position.X && bBoule.Position.Y > chariotBodies[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL))
+                if (bBoule.Position.X > chariotBodies[1].Position.X+(10 / Game1.METERINPIXEL) && bBoule.Position.X < chariotBodies[2].Position.X- (10 / Game1.METERINPIXEL) && bBoule.Position.Y > chariotBodies[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL))
                 {
                     standBy();
 
@@ -102,12 +101,10 @@ namespace Game1
                     {
                         if (idText2D == 6)
                         {
-                            System.Diagnostics.Debug.WriteLine("bombe");
                             parent.gameOver();
                         }
                         else
                         {
-                            System.Diagnostics.Debug.WriteLine("bonus");
                             parent.addBonus();
                         }
                     }

@@ -68,11 +68,11 @@ namespace Game1
         private void tableLayoutPanel_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
             if(e.Row == 0)
-                e.Graphics.FillRectangle(Brushes.PowderBlue, e.CellBounds);
+                e.Graphics.FillRectangle(Brushes.FloralWhite, e.CellBounds);
             else if (e.Row % 2 == 0)
-                e.Graphics.FillRectangle(Brushes.PaleTurquoise, e.CellBounds);
+                e.Graphics.FillRectangle(Brushes.WhiteSmoke, e.CellBounds);
             else
-                e.Graphics.FillRectangle(Brushes.LightCyan, e.CellBounds);
+                e.Graphics.FillRectangle(Brushes.GhostWhite, e.CellBounds);
         }
     }
 }

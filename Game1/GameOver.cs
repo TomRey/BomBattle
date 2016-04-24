@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -18,6 +19,8 @@ namespace Game1
         Rectangle[] rectBouton;
         Rectangle rectTitre, rectWallpaper;
         const int NB_BOUTON = 3;
+        SoundEffect sonBouton;
+
         public GameOver(Game1 parent)
         {
             this.parent = parent;
@@ -27,6 +30,7 @@ namespace Game1
 
         public void loadContent(Microsoft.Xna.Framework.Content.ContentManager content)
         {
+            sonBouton = content.Load<SoundEffect>("son/bouton");
             t2Dtitre = content.Load<Texture2D>("images/gameOver/gameOver");
             tabT2Dbouton[0] = content.Load<Texture2D>("images/gameOver/rejouer");
             tabT2Dbouton[1] = content.Load<Texture2D>("images/gameOver/sauver");
@@ -63,6 +67,7 @@ namespace Game1
 
         public void buttonAction(int i)
         {
+            sonBouton.Play();
             switch (i)
             {
                 case 0:
@@ -73,7 +78,6 @@ namespace Game1
                     break;
                 case 2:
                     parent.backToMenu();
-                    parent.setGameState(GameState.Menu);
                     break;
             }
         }

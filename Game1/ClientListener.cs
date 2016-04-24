@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -9,20 +10,51 @@ namespace Game1
 {
     class ClientListener : Listener
     {
-        Form1 parent;
-        Game1 game;
-        public ClientListener(TcpClient client, bool loop, Form1 parent, Game1 game) : base(client, loop)
+        Multi parent;
+        public ClientListener(TcpClient client, bool loop, Multi parent) : base(client, loop)
         {
             this.parent = parent;
-            this.game = game;
         }
+
         public override void actionResult(string data)
         {
-            parent.setGame(data);
-            string[] value = data.Split('a');
-            game.launchBoule(int.Parse(value[0]), int.Parse(value[1]), int.Parse(value[2]), int.Parse(value[3]), int.Parse(value[4]));
-            // System.Diagnostics.Debug.WriteLine(value[0] +" | " + value[1] + " | " + value[2] + " | " + value[3] + " | " + value[4]);
-            System.Diagnostics.Debug.WriteLine("recept: " + value[4]);
+            Debug.WriteLine(data);
+            string[] values = data.Split(';');
+            for (int i = 0; i < values.Length; i++)
+            {
+                string[] message = values[i].Split(':');
+                if (message[0] == "0")
+                {
+                    Debug.WriteLine("SETGAME");
+                    //game.launchBoule(int.Parse(value[0]), int.Parse(value[1]), int.Parse(value[2]), int.Parse(value[3]), int.Parse(value[4]));
+                    parent.setGame(message[1]);
+                }
+                else if (message[0] == "1")
+                {
+                    parent.initPlayer(message[1]);
+                }
+                else if (message[0] == "2")
+                {
+                    parent.setDataPlayer(message[1]);
+                }
+                else if (message[0] == "3")
+                {
+                    int idBonus = int.Parse(message[1].Split('#')[1]);
+                    parent.receiveBonus(idBonus);
+                }
+                else if (message[0] == "4")
+                {
+                    parent.decompte(message[1]);
+                }
+                else if (message[0] == "6")
+                {
+                    parent.finishGame(message[1]);
+                }
+                else if (message[0] == "7")
+                {
+                    parent.finishGameWinner(message[1]);
+                }
+            }
         }
     }
 }

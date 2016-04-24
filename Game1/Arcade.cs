@@ -23,6 +23,7 @@ namespace Game1
         float timer1, timer2, timer3, timer4 = 0;
         float tempsJeu;
         Random rand = new Random();
+
         public Arcade(BouleManager manager)
         {
             this.manager = manager;
@@ -68,7 +69,7 @@ namespace Game1
 
         public void start()
         {
-            manager.score = 0;
+            manager.reset();
             startCount = true;
             startGame = false;
             timer = 4;
@@ -120,7 +121,7 @@ namespace Game1
             }
             else
             {
-                manager.launchBoule(0, rand.Next(8), 1, rand.Next(2, 5), rand.Next(1, 3));
+                manager.launchBoule(0, getIdBoule(), 1, rand.Next(2, 8), rand.Next(4, 8));
                 timer1 = 0;
             }
 
@@ -132,7 +133,7 @@ namespace Game1
                 }
                 else
                 {
-                    manager.launchBoule(1, rand.Next(8), 1, rand.Next(1, 4), rand.Next(3, 5));
+                    manager.launchBoule(1, getIdBoule(), 1, rand.Next(2, 8), rand.Next(6, 12));
                     timer2 = 0;
                 }
             }
@@ -145,7 +146,7 @@ namespace Game1
                 }
                 else
                 {
-                    manager.launchBoule(2, rand.Next(8), -1, rand.Next(2, 5), rand.Next(1, 3));
+                    manager.launchBoule(2, getIdBoule(), -1, rand.Next(2, 8), rand.Next(4, 8));
                     timer3 = 0;
                 }
             }
@@ -156,9 +157,62 @@ namespace Game1
             }
             else
             {
-                manager.launchBoule(3, rand.Next(8), -1, rand.Next(1, 4), rand.Next(3, 5));
+                manager.launchBoule(3, getIdBoule(), -1, rand.Next(2, 8), rand.Next(6, 12));
                 timer4 = 0;
             }
         }
+
+        /*********************************
+        *     Probabilité des boules     *
+        **********************************
+        * +1    : 0 - 4
+        * +2    : 5 - 9
+        * +3    : 10 - 14
+        * -1    : 15 - 19
+        * -2    : 20 - 24
+        * -3    : 25 - 29
+        * bombe : 30 - 39
+        * bonus : 40 - 42
+        ***********************************/
+        private int getIdBoule()
+        {
+            int idAlea = rand.Next(35);
+
+            if (idAlea >= 0 && idAlea <= 4) //1)
+            {
+                idAlea = 0;
+            }
+            else if (idAlea >= 5 && idAlea <= 9)//2)
+            {
+                idAlea = 1;
+            }
+            else if (idAlea >= 10 && idAlea <= 14)//3)
+            {
+                idAlea = 2;
+            }
+            else if (idAlea >= 15 && idAlea <= 17)//4)
+            {
+                idAlea = 3;
+            }
+            else if (idAlea >= 18 && idAlea <= 20)//5)
+            {
+                idAlea = 4;
+            }
+            else if (idAlea >= 21 && idAlea <= 23)//6)
+            {
+                idAlea = 5;
+            }
+            else if (idAlea >= 24 && idAlea <= 30)//6)
+            {
+                idAlea = 6;
+            }
+            else//7)
+            {
+                idAlea = 7;
+            }
+
+            return idAlea;
+        }
+
     }
 }

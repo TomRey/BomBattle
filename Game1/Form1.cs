@@ -25,26 +25,25 @@ namespace Game1
         Client client;
         Server server;
         string pseudo;
+        public int vie { get; set; }
         int type = 1;
-        Game1 game1;
 
         private void btnCreer_Click(object sender, EventArgs e)
         {
+            vie = 0;
             type = 0;
             pseudo = tbxPseudo.Text;
-            server = new Server(tbxIP.Text, this);
-            client = new Client(tbxIP.Text, pseudo, this, game1);
+            //server = new Server(tbxIP.Text, this);
+            //client = new Client(tbxIP.Text, pseudo, this);
             btnStart.Visible = true;
-            game1.Run();
         }
 
         private void btnRejoindre_Click(object sender, EventArgs e)
         {
             type = 1;
             pseudo = tbxPseudo.Text;
-            client = new Client(tbxIP.Text, pseudo, this, game1);
+            //client = new Client(tbxIP.Text, pseudo, this);
             btnQuitter.Visible = true;
-            game1.Run();
         }
 
         public void setConnection(string ip)
@@ -73,6 +72,33 @@ namespace Game1
             }
         }
 
+        public void setDataPlayer(string val)
+        {
+            if (this.dataPlayer.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(setDataPlayer);
+                this.Invoke(d, new object[] { val });
+            }
+            else
+            {
+                dataPlayer.Text += val + Environment.NewLine;
+            }
+        }
+
+        public void initPlayer(string val)
+        {
+            if (this.dataPlayer.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(setDataPlayer);
+                this.Invoke(d, new object[] { val });
+            }
+            else
+            {
+                dataPlayer.Text += "nbJoueur = " + val + Environment.NewLine;
+            }
+            client.start();
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             string localIP;
@@ -83,16 +109,12 @@ namespace Game1
                 localIP = endPoint.Address.ToString();
             }
             tbxIP.Text = localIP;
-            game1 = new Game1();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if(type == 0)
                 server.stopServer();
-            if(client != null)
-            client.CloseConnection();
-
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -107,12 +129,14 @@ namespace Game1
 
         private void btnBombe_Click(object sender, EventArgs e)
         {
-            client.finish(pseudo + "-0-BOMBE");
+            //client.finish(pseudo + "-0-BOMBE");
+            vie++;
         }
 
         private void btnGagner_Click(object sender, EventArgs e)
         {
-            client.finish(pseudo + "-1-GAGNER");
+            //client.finish(pseudo + "-1-GAGNER");
+            vie--;
         }
     }
 }

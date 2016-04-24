@@ -38,6 +38,7 @@
             this.btnBombe = new System.Windows.Forms.Button();
             this.btnGagner = new System.Windows.Forms.Button();
             this.btnQuitter = new System.Windows.Forms.Button();
+            this.dataPlayer = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // btnCreer
@@ -133,11 +134,20 @@
             this.btnQuitter.Visible = false;
             this.btnQuitter.Click += new System.EventHandler(this.btnQuitter_Click);
             // 
+            // dataPlayer
+            // 
+            this.dataPlayer.Location = new System.Drawing.Point(278, 12);
+            this.dataPlayer.Name = "dataPlayer";
+            this.dataPlayer.Size = new System.Drawing.Size(116, 237);
+            this.dataPlayer.TabIndex = 11;
+            this.dataPlayer.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 292);
+            this.ClientSize = new System.Drawing.Size(429, 292);
+            this.Controls.Add(this.dataPlayer);
             this.Controls.Add(this.btnQuitter);
             this.Controls.Add(this.btnGagner);
             this.Controls.Add(this.btnBombe);
@@ -169,6 +179,7 @@
         private System.Windows.Forms.Button btnBombe;
         private System.Windows.Forms.Button btnGagner;
         private System.Windows.Forms.Button btnQuitter;
+        private System.Windows.Forms.RichTextBox dataPlayer;
     }
 }
 
