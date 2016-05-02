@@ -5,11 +5,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using MonoGameMPE.Core;
-using MonoGameMPE.Core.Modifiers;
-using MonoGameMPE.Core.Modifiers.Container;
-using MonoGameMPE.Core.Profiles;
 using System;
+using System.IO;
 
 namespace Game1
 {
@@ -19,7 +16,10 @@ namespace Game1
         Multi,
         Game,
         GameOver,
-        GameOverMulti
+        GameOverMulti,
+        FormMulti,
+        Classement,
+        Settings
     };
 
     /// <summary>
@@ -31,7 +31,7 @@ namespace Game1
         SpriteBatch spriteBatch;
         public static Rectangle FENETRE;
         public static float METERINPIXEL = 64f;
-        public static string CLASSEMENT_PATH = @"c:\temp\classement.txt";
+        public static string CLASSEMENT_PATH = "";
         public const string THEME = "wood";
         const int MOUSE_HEIGT = 35;
         const int MOUSE_WIDTH = 30;
@@ -51,7 +51,7 @@ namespace Game1
         MouseState ms, lastms;
 
         Rectangle rectMouse;
-        Rectangle rectWallpaper;
+        public static Rectangle rectWallpaper;
         Menu menu;
         GameOver gameOver;
         Multi multi;
@@ -60,7 +60,9 @@ namespace Game1
         private FrameCounter _frameCounter;
         SpriteFont fontInfo;
         Song sonMenu, sonJeu;
-        SongCollection songCollection;
+        Classement classement;
+        Settings settings;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -70,7 +72,7 @@ namespace Game1
             //Creation d'un nouveau monde en lui assignant une gravité
             world = new World(new Vector2(0, 20));
             gameState = GameState.Menu;
-            _frameCounter = new FrameCounter();
+            CLASSEMENT_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "classement.txt");
 
     }
 
@@ -87,22 +89,26 @@ namespace Game1
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            graphics.PreferredBackBufferWidth = 1600;
-            graphics.PreferredBackBufferHeight = 1000;
-            //pour fullscreen
-            //graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            //graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            graphics.IsFullScreen = false;
+            if(Settings1.Default.fenetre)
+            {
+                graphics.PreferredBackBufferWidth = 1600;
+                graphics.PreferredBackBufferHeight = 900;
+                graphics.IsFullScreen = false;
+            }
+            else
+            {
+                graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+                graphics.IsFullScreen = true;
+            }
             graphics.ApplyChanges();
 
             FENETRE = this.Window.ClientBounds;
-            this.Window.Position = new Point(0, 0);
+            this.Window.Position = new Point(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/2 - FENETRE.Width/2, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/2 - FENETRE.Height/2);
 
             rectWallpaper = new Rectangle(0, 0, FENETRE.Width, FENETRE.Height);
             rectMouse = new Rectangle(0, 0, MOUSE_WIDTH, MOUSE_HEIGT);
             menu = new Menu(this);
-            gameOver = new GameOver(this);
 
             #region Définition des bords
             sol = BodyFactory.CreateRectangle(world, FENETRE.Width, 1f / METERINPIXEL, 1f, new Vector2(0, FENETRE.Height / METERINPIXEL));
@@ -131,7 +137,16 @@ namespace Game1
             manager = new BouleManager(world, canon.getPosCanon(), sol, chariot, this);
             arcade = new Arcade(manager);
             multi = new Multi(this, manager, chariot);
-            
+            gameOver = new GameOver(this, manager);
+            classement = new Classement(this);
+            settings = new Settings(this, graphics);
+            _frameCounter = new FrameCounter();
+
+            if (Settings1.Default.son)
+                SoundEffect.MasterVolume = 0.5f;
+            else
+                SoundEffect.MasterVolume = 0;
+
             MediaPlayer.IsRepeating = true;
             base.Initialize();
         }
@@ -158,8 +173,10 @@ namespace Game1
             manager.loadContent(Content);
             arcade.loadContent(Content);
             multi.loadContent(Content);
-            
-            MediaPlayer.Play(sonMenu);
+            classement.loadContent(Content);
+            settings.loadContent(Content);
+
+            startSon();
         }
 
         /// <summary>
@@ -205,6 +222,24 @@ namespace Game1
                 multi.update(gameTime);
             }
 
+            if (gameState == GameState.FormMulti)
+            {
+                multi.updateSaisie(ms, lastms);
+                lastms = ms;
+            }
+
+            if (gameState == GameState.Classement)
+            {
+                classement.update(ms, lastms);
+                lastms = ms;
+            }
+
+            if (gameState == GameState.Settings)
+            {
+                settings.update(ms, lastms);
+                lastms = ms;
+            }
+
             if (gameState != GameState.GameOver && gameState != GameState.GameOverMulti)
                 HandleKeyboard();
 
@@ -216,6 +251,22 @@ namespace Game1
 
             world.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f);
             base.Update(gameTime);
+        }
+
+        protected override void OnExiting(Object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+            if (gameState == GameState.Multi || gameState == GameState.GameOverMulti)
+            {
+                multi.sendFinish();
+                multi.getClient().SendData("2:" + multi.getPseudo() + "#0#0#0#True;");
+                multi.getClient().close();
+                if (multi.Type == 0)
+                {
+                    multi.getServer().serverDown();
+                    multi.getServer().stopServer();
+                }
+            }
         }
 
         private void HandleKeyboard()
@@ -232,17 +283,6 @@ namespace Game1
             if (kbState.IsKeyDown(Keys.Right))
             {
                 chariot.move(1);
-            }
-
-            if (kbState.IsKeyDown(Keys.Down))
-            {
-                chariot.frein(1);
-            }
-
-            if (kbState.IsKeyDown(Keys.Space))
-            {
-                //manager.launchBoule();
-                manager.launchBoule(1, 5, 1, 3, 3);
             }
 
             if(gameState == GameState.Multi)
@@ -293,10 +333,10 @@ namespace Game1
             if (gameState == GameState.GameOver)
             {
                 spriteBatch.Draw(t2Dwall, rectWallpaper, Color.White);
-                gameOver.draw(spriteBatch);
                 canon.draw(spriteBatch);
                 manager.draw(spriteBatch);
                 chariot.draw(spriteBatch);
+                gameOver.draw(spriteBatch);
                 spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
             }
 
@@ -307,6 +347,24 @@ namespace Game1
                 manager.draw(spriteBatch);
                 chariot.draw(spriteBatch);
                 multi.draw(spriteBatch);
+                spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
+            }
+
+            if (gameState == GameState.Classement)
+            {
+                classement.draw(spriteBatch);
+                spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
+            }
+
+            if (gameState == GameState.FormMulti)
+            {
+                multi.drawSaisie(spriteBatch);
+                spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
+            }
+
+            if (gameState == GameState.Settings)
+            {
+                settings.draw(spriteBatch);
                 spriteBatch.Draw(t2Dmouse, rectMouse, Color.White);
             }
 
@@ -328,7 +386,6 @@ namespace Game1
             chariot.reset();
             gameState = GameState.Game;
             arcade.start();
-            startSonJeu();
         }
 
         public void backToMenu()
@@ -350,6 +407,7 @@ namespace Game1
 
         public void startSettings()
         {
+            gameState = GameState.Settings;
         }
 
         public void gameOverMulti()
@@ -364,25 +422,26 @@ namespace Game1
 
         public void startSon()
         {
-            MediaPlayer.Play(sonMenu);
+            if (Settings1.Default.son)
+            {
+                MediaPlayer.Play(sonMenu);
+                MediaPlayer.Volume = 0.8f;
+            }
         }
 
         public void startSonJeu()
         {
-            MediaPlayer.Play(sonJeu);
+            if (Settings1.Default.son)
+            {
+                MediaPlayer.Play(sonJeu);
+                MediaPlayer.Volume = 0.8f;
+            }
         }
 
-        public void save()
+        public void startClassement()
         {
-            FormArcade form = new FormArcade(manager.score);
-            form.ShowDialog();
-            if (form.DialogResult == System.Windows.Forms.DialogResult.OK)
-            {
-                chariot.reset();
-                gameState = GameState.Menu;
-                startSon();
-            }
-            System.Diagnostics.Debug.WriteLine(form.Pseudo);
-        }      
+            gameState = GameState.Classement;
+            classement.loadClassement();
+        }
     }
 }

@@ -17,11 +17,10 @@ namespace Game1
     {
         string pseudo = "";
         string ip = "";
-        int type = 0;
+        public int Type { get; set; }
         Game1 parent;
         Client client;
         Server server;
-        FormSession formS;
         BouleManager manager;
         Texture2D t2DRuban, t2DCercle, t2DMenu, t2DWinner, t2DGameOver;
         Vector2[] v2TabPosJoueurData;
@@ -39,14 +38,21 @@ namespace Game1
         bool bFinishGame = false;
         Chariot chariot;
         bool runningGame = false;
-        float VitesseTimer1, VitesseTimer2, VitesseTimer3, VitesseTimer4 = 0;
-        float timer1, timer2, timer3, timer4 = 0;
+        float VitesseTimer1 = 0, VitesseTimer2 = 0, VitesseTimer3 = 0, VitesseTimer4 = 0;
+        float timer1 = 0, timer2 = 0, timer3 = 0, timer4 = 0;
         float tempsJeu;
         Queue<GameData> listBoule;
         SoundEffect sonBouton;
+        MutliSaisie multiSaisie;
+        Session session;
+
+        public bool SessionOn { get; set; }
 
         public Multi(Game1 parent, BouleManager manager, Chariot chariot)
         {
+            multiSaisie = new MutliSaisie(parent, this);
+            session = new Session(parent, this);
+            SessionOn = false;
             listBoule = new Queue<GameData>();
             this.chariot = chariot;
             posTxt = new Vector2((Game1.FENETRE.Width / 2), Game1.FENETRE.Height / 2);
@@ -92,6 +98,8 @@ namespace Game1
             t2DMenu = content.Load<Texture2D>("images/gameOver/menu");
             t2DWinner = content.Load<Texture2D>("images/multi/winner");
             t2DGameOver = content.Load<Texture2D>("images/multi/gameOver");
+            multiSaisie.loadContent(content);
+            session.loadContent(content);
             posBoutonMenu = new Vector2(Game1.FENETRE.Width / 2 - t2DMenu.Width / 2, Game1.FENETRE.Height / 2 + t2DMenu.Height/2);
         }
 
@@ -127,6 +135,12 @@ namespace Game1
             }
         }
 
+        public void changePseudo(string newPseudo)
+        {
+            client.Pseudo = newPseudo;
+            this.pseudo = newPseudo;
+        }
+
         public void sendFinish()
         {
             client.SendData("5:" + pseudo + ";");
@@ -148,7 +162,7 @@ namespace Game1
         {
             foreach (KeyValuePair<string, JoueurData> joueur in joueurData)
             {
-                if (state.IsKeyDown(joueur.Value.Key) && joueur.Value.Finish == "False")
+                if (state.IsKeyDown(joueur.Value.Key) && joueur.Value.Finish == "False" && joueur.Value.Pseudo != pseudo)
                 {
                     if(bonusDispo)
                     {
@@ -169,7 +183,7 @@ namespace Game1
             }
         }
 
-        public void generateBoules(GameTime gameTime)
+        private void generateBoules(GameTime gameTime)
         {
             if (tempsJeu > 20)
             {
@@ -248,8 +262,8 @@ namespace Game1
                 manager.launchBoule(3, data.Boule, -1, data.W, data.H);
                 timer4 = 0;
             }
-
         }
+
         public void update(MouseState ms, MouseState lastms)
         {
             if (ms.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && lastms.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
@@ -257,7 +271,7 @@ namespace Game1
                 if (ms.X > posBoutonMenu.X && ms.X < posBoutonMenu.X + t2DMenu.Width &&
                     ms.Y > posBoutonMenu.Y && ms.Y < posBoutonMenu.Y + t2DMenu.Height)
                 {
-                    if(type == 0)
+                    if(Type == 0)
                     {
                         server.stopServer();
                     }
@@ -281,6 +295,22 @@ namespace Game1
             }
         }
 
+        public void updateSaisie(MouseState ms, MouseState lastms)
+        {
+            if (SessionOn)
+                session.update(ms, lastms);
+            else
+                multiSaisie.update(ms, lastms);
+        }
+
+        public void drawSaisie(SpriteBatch spriteBatch)
+        {
+            if (SessionOn)
+                session.draw(spriteBatch);
+            else
+                multiSaisie.draw(spriteBatch);
+        }
+
         public void start()
         {
             listBoule.Clear();
@@ -293,63 +323,49 @@ namespace Game1
             VitesseTimer2 = 6;
             VitesseTimer3 = 4;
             VitesseTimer4 = 3;
-            FormMulti form;
-            string message = "";
+
             manager.reset();
-            do
+            parent.gameState = GameState.FormMulti;
+        }
+
+        public void rejoindre(string pseudo, string ip)
+        {
+            this.pseudo = pseudo;
+            this.ip = ip;
+            this.Type = 1;
+            try
             {
-                form = new FormMulti(message, pseudo, ip, type);
-                form.ShowDialog();
-                if (form.DialogResult == System.Windows.Forms.DialogResult.OK)
-                {
-                    pseudo = form.Pseudo;
-                    ip = form.IP;
-                    type = form.Type;
+                client = new Client(ip, pseudo, this);
+                parent.gameState = GameState.Multi;
+            }
+            catch (Exception e)
+            {
+                multiSaisie.setMessage("impossible de contacter le serveur!");
+            }
+        }
 
-                    if (type == 0)
-                    {
-                        try
-                        {
-                            server = new Server(ip, this);
-                        }
-                        catch (Exception e)
-                        {
-                            form.Erreur = true;
-                            message = "impossible de lancer le serveur!";
-                            continue;
-                        }
+        public void creer(string pseudo, string ip)
+        {
+            this.pseudo = pseudo;
+            this.ip = ip;
+            this.Type = 0;
+            try
+            {
+                server = new Server(ip, this);
+            }
+            catch (Exception e)
+            {
+                multiSaisie.setMessage("impossible de lancer le serveur!");
+                return;
+            }
 
-                        form.Dispose();
-                        formS = new FormSession();
-                        client = new Client(ip, pseudo, this);
-                        formS.ShowDialog();
+            SessionOn = true;          
+            client = new Client(ip, pseudo, this);
+        }
 
-                        if (formS.DialogResult == System.Windows.Forms.DialogResult.OK)
-                        {
-                            parent.gameState = GameState.Multi;
-                            server.startGame();
-                            parent.startSonJeu();
-                        }
-                        else
-                        {
-                            server.stopServer();
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            client = new Client(ip, pseudo, this);
-                            parent.gameState = GameState.Multi;
-                        }
-                        catch (Exception e)
-                        {
-                            form.Erreur = true;
-                            message = "impossible de contacter le serveur!";
-                        }
-                    }
-                }
-            } while (form.Erreur);
+        public void serverDown()
+        {
+            finishGame("Serveur Down!");
         }
 
         public void decompte(string cpt)
@@ -370,10 +386,8 @@ namespace Game1
             string[] values = data.Split('#');
             for (int i = 0; i < values.Length; i++)
             {
-                joueurData[values[0]].setData(values[1], values[2], values[3], values[4]);
-                
+                joueurData[values[0]].setData(values[1], values[2], values[3], values[4]);              
             }
-            //Debug.WriteLine(data);
         }
 
         public void sendWinner()
@@ -390,6 +404,7 @@ namespace Game1
 
         public void finishGame(string pseudoGagnant)
         {
+            manager.bGameOver = true;
             runningGame = false;
             parent.gameState = GameState.GameOverMulti;
             bFinishGame = true;
@@ -413,7 +428,7 @@ namespace Game1
 
         public void setConnection(string data)
         {
-            formS.setConnection(data);
+            session.addPlayer(data);
         }
 
         public void setGame(string data)
@@ -428,8 +443,23 @@ namespace Game1
                 string[] d = values[i].Split('#');
                 listBoule.Enqueue(new GameData(int.Parse(d[0]), int.Parse(d[1]), int.Parse(d[2]), int.Parse(d[3]), int.Parse(d[4])));
             }
-            //Debug.WriteLine("boule " + listBoule.ElementAt(0).Boule+"");
+            Debug.WriteLine("nombre de boules " + listBoule.Count+"");
             runningGame = true;
+        }
+
+        public Server getServer()
+        {
+            return server;
+        }
+
+        public Client getClient()
+        {
+            return client;
+        }
+
+        public string getPseudo()
+        {
+            return pseudo;
         }
     }
 }

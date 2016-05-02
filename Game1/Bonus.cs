@@ -37,6 +37,7 @@ namespace Game1
         Vector2[] posBonusActif;
         int POS_H_VIE = Game1.FENETRE.Height - 75;
         int lastBonusIDtab;
+        Rectangle rectBlackScreen;
 
         public Bonus(Chariot chariot)
         {
@@ -75,6 +76,7 @@ namespace Game1
             t2Dbonus[1] = tabT2Dbonus[0];
             t2DbonusDispo = tabT2Dbonus[0];
             blackscreenOrigin = new Vector2(blackScreen.Width / 2, blackScreen.Height / 2);
+            rectBlackScreen = new Rectangle(0, 0, Game1.FENETRE.Width, Game1.FENETRE.Height - blackScreen.Height / 2);
         }
 
         private void bonusUpdate(int idTab)
@@ -141,7 +143,7 @@ namespace Game1
         {
             if (id[0] == 7 || id[1] == 7)
             {
-                spriteBatch.Draw(blackScreen2, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(blackScreen2, rectBlackScreen, Color.White);
                 spriteBatch.Draw(blackScreen, chariot.getPos(), null, Color.White, 0, blackscreenOrigin, 1f, SpriteEffects.None, 0f);
             }
 

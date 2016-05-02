@@ -104,17 +104,11 @@ namespace Game1
 
             JointFactory.CreateWeldJoint(world, tabBpanier[0], tabBpanier[1], new Vector2(tabBpanier[0].LocalCenter.X - (PANIER_WIDTH/ (2f*Game1.METERINPIXEL)), tabBpanier[0].LocalCenter.Y), new Vector2(tabBpanier[1].LocalCenter.X, tabBpanier[1].LocalCenter.Y + (PANIER_HEIGHT / (2f * Game1.METERINPIXEL))));
             JointFactory.CreateWeldJoint(world, tabBpanier[0], tabBpanier[2], new Vector2(tabBpanier[0].LocalCenter.X + (PANIER_WIDTH / (2f * Game1.METERINPIXEL)), tabBpanier[0].LocalCenter.Y), new Vector2(tabBpanier[2].LocalCenter.X, tabBpanier[2].LocalCenter.Y + (PANIER_HEIGHT / (2f * Game1.METERINPIXEL))));
-            /*JointFactory.CreateRevoluteJoint(world, tabBpanier[0], tabBpanier[1], Vector2.Zero);
-            JointFactory.CreateRevoluteJoint(world, tabBpanier[0], tabBpanier[2], Vector2.Zero);
-            JointFactory.CreateAngleJoint(world, tabBpanier[0], tabBpanier[1]);
-            JointFactory.CreateAngleJoint(world, tabBpanier[0], tabBpanier[2]);*/
             #endregion
         }
 
         public void move(int direction)
         {
-            /*bRoueG.FixedRotation = false;
-            bRoueD.FixedRotation = false;*/
             bRoueG.ApplyTorque(direction * 8f * inverse);
             bRoueD.ApplyTorque(direction * 8f * inverse);
 
@@ -136,14 +130,6 @@ namespace Game1
             impulsion = vitesseNormal;
         }
 
-        public void frein(int direction)
-        {
-            /*bRoueG.FixedRotation = true;
-            bRoueD.FixedRotation = true;*/
-
-            tabBpanier[0].ApplyForce(new Vector2(0f, 50f));
-        }
-
         public void explose()
         {
             bombe.Play();
@@ -152,7 +138,7 @@ namespace Game1
             t2DPanierActif = t2DpanierGameOver;
             t2DroueActif = t2DroueGameOver;
             this.world.RemoveJoint(jointRoue);
-            //bRoueD.ApplyTorque(10f);
+
             for(int i = 0; i < tabBpanier.Length; i++)
                 bRoueD.IgnoreCollisionWith(tabBpanier[i]);
             bRoueD.ApplyTorque(10f);

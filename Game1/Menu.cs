@@ -37,11 +37,11 @@ namespace Game1
             tabT2Dbouton[2] = content.Load<Texture2D>("images/menu/options");
             tabT2Dbouton[3] = content.Load<Texture2D>("images/menu/quitter");
             tabT2Dbouton[4] = content.Load<Texture2D>("images/menu/classement");
-            rectTitre = new Rectangle(Game1.FENETRE.Width / 2 - t2Dtitre.Width / 2, 50, t2Dtitre.Width, t2Dtitre.Height);
+            rectTitre = new Rectangle(Game1.FENETRE.Width / 2 - t2Dtitre.Width / 2, Game1.FENETRE.Height / 2 - t2Dtitre.Height-50, t2Dtitre.Width, t2Dtitre.Height);
            
             int space = (Game1.FENETRE.Width - 4 * tabT2Dbouton[0].Width) / 4;
             for (int i = 0; i < tabT2Dbouton.Length-1; i++)
-                rectBouton[i] = new Rectangle(space + (i * tabT2Dbouton[i].Width + space), 600, tabT2Dbouton[i].Width, tabT2Dbouton[i].Height);
+                rectBouton[i] = new Rectangle(space + (i * tabT2Dbouton[i].Width + space), Game1.FENETRE.Height/2 + rectBouton[i].Height+100, tabT2Dbouton[i].Width, tabT2Dbouton[i].Height);
             rectBouton[4] = new Rectangle(rectBouton[0].X, rectBouton[0].Height + rectBouton[0].Y, tabT2Dbouton[4].Width, tabT2Dbouton[4].Height);
 
         }
@@ -87,8 +87,7 @@ namespace Game1
                     parent.Exit();
                     break;
                 case 4:
-                    FormClassement form = new FormClassement();
-                    form.ShowDialog();
+                    parent.startClassement();
                     break;
             }
         }

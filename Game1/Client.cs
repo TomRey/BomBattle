@@ -11,18 +11,18 @@ namespace Game1
     class Client
     {
         TcpClient clientSocket = new TcpClient();
-        string pseudo;
+        public string Pseudo{get; set;}
         Multi parent;
         ClientListener clientReq;
         bool stop = false;
 
         public Client(string ip, string name, Multi parent)
         {
-            pseudo = name;
+            Pseudo = name;
             this.parent = parent;
             clientSocket.Connect(ip, 8888);
-            SendData(name);
             clientReq = new ClientListener(clientSocket, true, parent);
+            SendData(name);
         }
 
         public void start()
@@ -44,7 +44,7 @@ namespace Game1
                 if (!clientSocket.Connected)
                     return;
                 NetworkStream serverStream = clientSocket.GetStream();
-                byte[] outStream = System.Text.Encoding.ASCII.GetBytes("2:" + pseudo + "#" + parent.getPlayerData() + ";");
+                byte[] outStream = System.Text.Encoding.ASCII.GetBytes("2:" + Pseudo + "#" + parent.getPlayerData() + ";");
                 serverStream.Write(outStream, 0, outStream.Length);
                 //serverStream.Flush();
                 Thread.Sleep(2000);

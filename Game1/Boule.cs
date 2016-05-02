@@ -19,6 +19,7 @@ namespace Game1
         Texture2D t2D;
         Vector2 pos, bouleOrigin;
         const int BOULE_SIZE = 45;
+
         public Boule(World world, Body sol)
         {
             pos = new Vector2(0, 0);
@@ -89,7 +90,7 @@ namespace Game1
                     standBy();
                 }
 
-                if (bBoule.Position.X > chariotBodies[1].Position.X+(10 / Game1.METERINPIXEL) && bBoule.Position.X < chariotBodies[2].Position.X- (10 / Game1.METERINPIXEL) && bBoule.Position.Y > chariotBodies[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL))
+                if (bBoule.Position.X > chariotBodies[1].Position.X+(10 / Game1.METERINPIXEL) && bBoule.Position.X < chariotBodies[2].Position.X- (10 / Game1.METERINPIXEL) && bBoule.Position.Y > chariotBodies[0].Position.Y - ((BOULE_SIZE + 10) / Game1.METERINPIXEL) && bBoule.Position.Y < chariotBodies[0].Position.Y)
                 {
                     standBy();
 

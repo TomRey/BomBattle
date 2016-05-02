@@ -25,7 +25,6 @@ namespace Game1
                 string[] message = values[i].Split(':');
                 if (message[0] == "0")
                 {
-                    Debug.WriteLine("SETGAME");
                     //game.launchBoule(int.Parse(value[0]), int.Parse(value[1]), int.Parse(value[2]), int.Parse(value[3]), int.Parse(value[4]));
                     parent.setGame(message[1]);
                 }
@@ -53,6 +52,14 @@ namespace Game1
                 else if (message[0] == "7")
                 {
                     parent.finishGameWinner(message[1]);
+                }
+                else if(message[0] == "8")
+                {
+                    parent.serverDown();
+                }
+                else if (message[0] == "9")
+                {
+                    parent.changePseudo(message[1]);
                 }
             }
         }
